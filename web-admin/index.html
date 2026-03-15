@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MuniGo Admin</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <header class="topbar">
+        <h1>Panel Municipal MuniGo</h1>
+        <div class="tag">Omnicanal web + mobile</div>
+      </header>
+
+      <section class="login-card">
+        <h2>Acceso Operador</h2>
+        <div class="login-fields">
+          <input id="emailInput" type="email" placeholder="operador@munigo.pe" />
+          <input id="passwordInput" type="password" placeholder="Contrasena" />
+          <button id="loginButton">Iniciar sesion</button>
+          <button id="logoutButton" class="secondary">Cerrar sesion</button>
+        </div>
+      </section>
+
+      <section class="controls">
+        <button id="refreshButton">Actualizar reportes</button>
+        <label>
+          Estado:
+          <select id="statusFilter">
+            <option value="">Todos</option>
+            <option value="PENDING">PENDING</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="RESOLVED">RESOLVED</option>
+            <option value="REJECTED">REJECTED</option>
+          </select>
+        </label>
+        <span id="statusText">Conectando...</span>
+      </section>
+
+      <section>
+        <h2>Bandeja Operativa</h2>
+        <div id="reportsContainer" class="cards"></div>
+      </section>
+    </main>
+
+    <script src="./main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,86 @@
+
+> temp_expo@1.0.0 test
+> jest src/__tests__/HomeScreen.test.tsx
+
+FAIL src/__tests__/HomeScreen.test.tsx
+  HomeScreen
+    ├ù renders correctly with user name (1061 ms)
+    ├ù renders stats badges (61 ms)
+
+  ÔùÅ HomeScreen ÔÇ║ renders correctly with user name
+
+    Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
+
+    Check the render method of `ReportCard`.
+
+      36 |
+      37 |   it('renders correctly with user name', () => {
+    > 38 |     const { getByText } = render(<HomeScreen />);
+         |                                 ^
+      39 |     expect(getByText('Hola, Test User')).toBeTruthy();
+      40 |     expect(getByText('Ciudad Sat├®lite, MX')).toBeTruthy();
+      41 |   });
+
+      at createFiberFromTypeAndProps (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14784:28)
+      at createFiberFromElement (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14798:14)
+      at createChild (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:3450:26)
+      at reconcileChildrenArray (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:3780:25)
+      at reconcileChildFibersImpl (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4097:30)
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4202:33
+      at reconcileChildren (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6684:13)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8576:13)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12253:39)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/__tests__/HomeScreen.test.tsx:38:33)
+
+  ÔùÅ HomeScreen ÔÇ║ renders stats badges
+
+    Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
+
+    Check the render method of `ReportCard`.
+
+      42 |
+      43 |   it('renders stats badges', () => {
+    > 44 |     const { getByText } = render(<HomeScreen />);
+         |                                 ^
+      45 |     expect(getByText('Reportes')).toBeTruthy();
+      46 |     expect(getByText('Resueltos')).toBeTruthy();
+      47 |     expect(getByText('En curso')).toBeTruthy();
+
+      at createFiberFromTypeAndProps (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14784:28)
+      at createFiberFromElement (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14798:14)
+      at createChild (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:3450:26)
+      at reconcileChildrenArray (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:3780:25)
+      at reconcileChildFibersImpl (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4097:30)
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4202:33
+      at reconcileChildren (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6684:13)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8576:13)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12253:39)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/__tests__/HomeScreen.test.tsx:44:33)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        4.671 s, estimated 8 s
+Ran all test suites matching src/__tests__/HomeScreen.test.tsx.

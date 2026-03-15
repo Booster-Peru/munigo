@@ -1,0 +1,68 @@
+FAIL tests/ReportCard.test.tsx (10.886 s)
+  ReportCard
+    ÔêÜ renders report details correctly (3819 ms)
+    ├ù calls onPress when pressed (110 ms)
+    ÔêÜ applies correct status colors for Resolved status (59 ms)
+    ÔêÜ applies correct status colors for non-Resolved status (11 ms)
+
+  ÔùÅ ReportCard ÔÇ║ calls onPress when pressed
+
+    Unable to find an element with role: button
+
+    <View
+      accessible={true}
+    >
+      <View>
+        <View>
+          <Text>
+            Vialidad
+          </Text>
+        </View>
+        <View>
+          <Text>
+            Pendiente
+          </Text>
+        </View>
+      </View>
+      <Text>
+        Bache en la calle principal
+      </Text>
+      <View>
+        <View>
+          <View
+            testID="lucide-icon-Clock"
+          />
+          <Text>
+            2023-11-01
+          </Text>
+        </View>
+        <View>
+          <View
+            testID="lucide-icon-TrendingUp"
+          />
+          <Text>
+            12
+             apoyos
+          </Text>
+        </View>
+        <View
+          testID="lucide-icon-ChevronRight"
+        />
+      </View>
+    </View>
+
+      30 |     
+      31 |     // The main TouchableOpacity is the card itself
+    > 32 |     const card = getByRole('button'); // TouchableOpacity with onPress has role button
+         |                  ^
+      33 |     fireEvent.press(card);
+      34 |     
+      35 |     expect(onPressMock).toHaveBeenCalledTimes(1);
+
+      at Object.getByRole (tests/ReportCard.test.tsx:32:18)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 passed, 4 total
+Snapshots:   0 total
+Time:        12.454 s
+Ran all test suites matching tests/ReportCard.test.tsx.

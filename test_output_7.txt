@@ -1,0 +1,24 @@
+
+> temp_expo@1.0.0 test
+> jest src/__tests__/HomeScreen.test.tsx
+
+FAIL Android src/__tests__/HomeScreen.test.tsx
+  ÔùÅ Test suite failed to run
+
+    ReferenceError: expect is not defined
+
+    > 1 | import '@testing-library/jest-native/extend-expect';
+        | ^
+      2 |
+      3 | // Mocking expo globals that cause ReferenceError
+      4 | global.__ExpoImportMetaRegistry = { ImportMetaRegistry: {} };
+
+      at Object.<anonymous> (node_modules/@testing-library/jest-native/dist/extend-expect.js:13:1)
+      at Object.<anonymous> (node_modules/@testing-library/jest-native/extend-expect.js:1:1)
+      at Object.<anonymous> (jest.setup.js:1:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        3.563 s
+Ran all test suites matching src/__tests__/HomeScreen.test.tsx.

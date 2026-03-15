@@ -1,0 +1,104 @@
+services:
+  api-gateway:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node gateway/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - GATEWAY_PORT=8080
+      - IDENTITY_URL=http://identity:4001
+      - REPORTS_URL=http://reports:4002
+      - GEO_URL=http://geo:4003
+      - NOTIFICATIONS_URL=http://notifications:4004
+    ports:
+      - '8080:8080'
+    depends_on:
+      - identity
+      - reports
+      - geo
+      - notifications
+
+  identity:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/identity/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - IDENTITY_PORT=4001
+    ports:
+      - '4001:4001'
+
+  reports:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/reports/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - REPORTS_PORT=4002
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - NATS_URL=nats://nats:4222
+      - NOTIFICATIONS_URL=http://notifications:4004
+    ports:
+      - '4002:4002'
+    depends_on:
+      - postgres
+      - nats
+
+  geo:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/geo/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - GEO_PORT=4003
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+    ports:
+      - '4003:4003'
+    depends_on:
+      - postgres
+
+  notifications:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/notifications/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - NOTIFICATIONS_PORT=4004
+      - REDIS_URL=redis://redis:6379
+      - NATS_URL=nats://nats:4222
+    ports:
+      - '4004:4004'
+    depends_on:
+      - redis
+      - nats
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      - POSTGRES_USER=munigo
+      - POSTGRES_PASSWORD=munigo
+      - POSTGRES_DB=munigo
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+  nats:
+    image: nats:2.10-alpine
+    command: ['-js']
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+
+volumes:
+  pgdata:

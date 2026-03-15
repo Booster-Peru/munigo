@@ -1,0 +1,134 @@
+:root {
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --border: #dbe1ed;
+  --text: #0f172a;
+  --muted: #4b5563;
+  --accent: #1252d6;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 20% 20%, #e2ebff 0%, var(--bg) 50%);
+  color: var(--text);
+}
+
+.layout {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.tag {
+  background: #dbe8ff;
+  color: #163f95;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.controls {
+  margin: 16px 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.login-card {
+  margin-top: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.login-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 8px;
+}
+
+input {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+select {
+  margin-left: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+button {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #334155;
+}
+
+.cards {
+  display: grid;
+  gap: 12px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-button {
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .login-fields {
+    grid-template-columns: 1fr;
+  }
+}

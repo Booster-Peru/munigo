@@ -1,0 +1,90 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "Configuracion base del proyecto",
+      "assignee": "Director",
+      "dependencies": [],
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "id": "task-002",
+      "title": "Plan maestro integral actualizado",
+      "assignee": "Architect",
+      "dependencies": ["task-001"],
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "id": "task-003",
+      "title": "Hardening auth y sesiones",
+      "assignee": "Backend",
+      "dependencies": ["task-002"],
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "id": "task-004",
+      "title": "Autorizacion por recurso reportes",
+      "assignee": "Backend",
+      "dependencies": ["task-003"],
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "id": "task-005",
+      "title": "Web admin roles y guardas",
+      "assignee": "Frontend",
+      "dependencies": ["task-003"],
+      "status": "in-progress",
+      "priority": "high"
+    },
+    {
+      "id": "task-006",
+      "title": "OpenAPI v1 contratos base",
+      "assignee": "Architect",
+      "dependencies": ["task-004"],
+      "status": "pending",
+      "priority": "medium"
+    },
+    {
+      "id": "task-007",
+      "title": "Pipeline CI calidad",
+      "assignee": "Reviewer",
+      "dependencies": ["task-005"],
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "id": "task-008",
+      "title": "Geovisor operativo fase 1",
+      "assignee": "Frontend",
+      "dependencies": ["task-006"],
+      "status": "pending",
+      "priority": "medium"
+    },
+    {
+      "id": "task-009",
+      "title": "SLA y alertas operativas",
+      "assignee": "Backend",
+      "dependencies": ["task-006"],
+      "status": "pending",
+      "priority": "medium"
+    },
+    {
+      "id": "task-010",
+      "title": "Cierre iteracion y reporte Booster",
+      "assignee": "Director",
+      "dependencies": ["task-003", "task-004", "task-005"],
+      "status": "pending",
+      "priority": "high"
+    }
+  ],
+  "active_locks": [
+    {
+      "owner": "Frontend",
+      "file": "web-admin/main.js"
+    }
+  ]
+}

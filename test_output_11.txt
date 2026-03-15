@@ -1,0 +1,19 @@
+
+> temp_expo@1.0.0 test
+> jest src/__tests__/HomeScreen.test.tsx
+
+FAIL src/__tests__/HomeScreen.test.tsx
+  ÔùÅ Test suite failed to run
+
+    ReferenceError: You are trying to `import` a file outside of the scope of the test code.
+
+      at Runtime._execModule (node_modules/jest-runtime/build/index.js:1212:13)
+      at node_modules/expo/src/winter/runtime.native.ts:23:10
+      at get (node_modules/expo/src/winter/installGlobal.ts:54:19)
+      at Object.getValue [as structuredClone] (node_modules/expo/src/winter/installGlobal.ts:15:16)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        12.63 s
+Ran all test suites matching src/__tests__/HomeScreen.test.tsx.
