@@ -1224,5 +1224,7 @@ El ciclo de pago hacia conductores y operadores no esta implementado.
 
 ---
 
-*specs.md v4.0.0 — Actualizado el 2026-03-16*
-*Secciones 13-14 nuevas: Modelo de negocio + monetizacion + estado real del codigo*
+*specs.md v4.1.0 — Actualizado el 2026-03-16*
+*Secciones 13-14: Modelo de negocio completo, go-to-market hibrido, formalizacion SUNAT,
+ expansion geografica (una sola app para todo Peru), calculo de tarifas por zonas,
+ estado real del codigo a 2026-03-16*

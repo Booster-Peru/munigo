@@ -386,113 +386,258 @@ Frontend:
 
 ---
 
-## Fase 5 — Billetera completa + Super Admin Web
+## Fase 5 — Billetera completa + Super Admin Panel + Onboarding de partners
 
-**Objetivo:** Billetera con recargas reales via Culqi y refactor completo del web-admin.
-**Duracion estimada:** 5-7 dias
+**Objetivo:** Completar el ciclo de dinero (recargas y retiros reales) y dar a los operadores herramientas para gestionar su catalogo. El Super Admin Panel pasa a ser el centro de control del negocio.
+**Duracion estimada:** 7-10 dias
 
-### 5.1 Billetera completa
+### 5.1 Billetera completa (ciudadano)
 ```
-Frontend (wallet service ya existe desde Fase 0):
-- src/screens/wallet/WalletScreen.tsx — saldo + historial + acciones
-- src/screens/wallet/WalletRechargeScreen.tsx — seleccionar monto + metodo pago
-- src/screens/wallet/WalletWithdrawScreen.tsx — monto + cuenta destino
-- src/screens/wallet/WalletBankAccountScreen.tsx — vincular cuenta bancaria
-- src/screens/wallet/WalletMonthlyReportScreen.tsx — movimientos del mes
+Frontend (wallet service ya existe):
+- WalletRechargeScreen — seleccionar monto + metodo de pago (PSP a definir)
+- WalletWithdrawScreen — monto + cuenta bancaria destino (para conductores/operadores)
+- WalletBankAccountScreen — vincular CCI/cuenta bancaria
+- WalletMonthlyReportScreen — resumen del mes descargable
 
-Integraciones de pago:
-- Yape QR (via API Yape Business)
-- Plin (via API Plin)
-- Tarjeta Visa/MC (via Culqi u otro PSP peruano)
+PSP: pendiente de decision. Candidatos: Yape Business, Plin, Izipay, Niubiz.
+No asumir Culqi. Ver memory/project_payment_gateway.md
 ```
 
-### 5.2 Super Admin Panel (web-admin)
+### 5.2 platform_config — tarifas configurables desde DB
 ```
-Acceso: web-admin React SPA, ruta /admin, requiere rol SUPER_ADMIN
-Paginas:
-- /admin/dashboard — metricas en tiempo real (conductores, viajes, transacciones, comision)
-- /admin/drivers — lista de conductores, estado, suspender/reactivar
-- /admin/trips — historial de viajes con filtros
-- /admin/transactions — movimientos financieros, escrow, comisiones
+CRITICO: Sacar del codigo todos los valores hardcodeados de tarifas y comisiones.
 
-Backend: nuevo endpoint GET /v1/transport/admin/stats
-- Requiere rol SUPER_ADMIN
-- Retorna: conductores activos, viajes del dia, transacciones totales, comision acumulada
+Backend: nuevo microservicio config (puerto 4012) O tabla en gateway
+Tabla: platform_config(key, value, label, type, module, updated_by, updated_at)
+Seed inicial: transport_fare_standard, transport_fare_premium,
+              transport_commission_pct, food_commission_pct,
+              shop_commission_pct, mandados_commission_pct,
+              delivery_fee_fixed, mandados_fare_*
+
+Endpoints:
+- GET  /v1/admin/config        (SUPER_ADMIN)
+- PATCH /v1/admin/config/:key  (SUPER_ADMIN)
+- GET  /v1/config/public       (publico — fares para mostrar al ciudadano)
+
+Cada microservicio (transport, orders, mandados, wallet) consulta esta tabla
+en lugar de leer constantes del codigo.
 ```
 
-### 5.3 Refactor web-admin
+### 5.3 Calculo de tarifa de transporte por zonas
 ```
-web-admin/ — refactor a React SPA (Vite + React)
+Reemplazar tarifa fija hardcodeada por modelo de zonas configurables:
+
+DB nueva:
+- fare_zones(id, municipality_id, name, polygon GEOMETRY, color)
+- zone_fares(from_zone_id, to_zone_id, fare, night_fare)
+
+Backend transport:
+- GET /v1/transport/estimate?from_lat=&from_lng=&to_lat=&to_lng=
+  → retorna tarifa estimada antes de confirmar
+
+Frontend:
+- BookingScreen muestra tarifa estimada segun origen y destino seleccionados
+- El ciudadano ve el precio ANTES de solicitar, como en Uber
+```
+
+### 5.4 Panel del operador — gestion de catalogo
+```
+CRITICO: Hoy los catalogos son seed hardcodeado. Los operadores necesitan
+poder gestionar sus propios productos.
+
+Backend catalog — nuevos endpoints:
+- POST   /v1/catalog/restaurants/:id/menu      — agregar item
+- PATCH  /v1/catalog/menu/:itemId              — actualizar item (precio, disponibilidad)
+- DELETE /v1/catalog/menu/:itemId              — eliminar item
+- POST   /v1/catalog/stores/:id/products       — agregar producto
+- PATCH  /v1/catalog/products/:id              — actualizar producto
+- DELETE /v1/catalog/products/:id              — eliminar producto
+- GET    /v1/catalog/image-search?q=           — buscar imagen (proxy a Google/Unsplash)
+- POST   /v1/catalog/upload-image              — subir foto desde camara
+
+Frontend (nuevas pantallas):
+- src/screens/operator/CatalogManagerScreen.tsx — lista de items con precio editable
+- src/screens/operator/AddProductScreen.tsx — formulario nuevo producto + busqueda de imagen
+```
+
+### 5.5 Onboarding de partners
+```
+Flujo completo para que restaurantes y tiendas se registren solos:
+
+DB nueva:
+- partner_applications(id, applicant_id, business_name, type, ruc,
+    address, lat, lng, schedule, logo_url, documents JSONB,
+    status [PENDING|APPROVED|REJECTED], reviewed_by, reviewed_at)
+
+Backend: endpoints de aplicacion en catalog service o nuevo service
+
+Frontend:
+- src/screens/operator/PartnerOnboardingScreen.tsx — formulario registro
+- src/screens/operator/PartnerStatusScreen.tsx — estado de aprobacion
+
+Super Admin Panel web:
+- /admin/applications — lista de solicitudes pendientes con aprobar/rechazar
+```
+
+### 5.6 Super Admin Panel (web-admin refactor)
+```
+web-admin/ — refactor a React SPA completo (Vite + React)
+
 Modulos:
-- Login con rol SUPER_ADMIN (JWT verificado)
-- Dashboard con metricas
-- Mapa de conductores activos (Google Maps)
-- Gestion de conductores (listar, suspender, reactivar)
-- Gestion de reportes ciudadanos
-- Reportes financieros
+- /admin/login — autenticacion SUPER_ADMIN
+- /admin/dashboard — metricas tiempo real: conductores, viajes, transacciones, comision
+- /admin/config — editar platform_config (tarifas, comisiones)
+- /admin/drivers — lista conductores, estado, documentos, suspender/reactivar
+- /admin/trips — historial viajes con filtros
+- /admin/orders — historial pedidos (food + tiendas + mandados)
+- /admin/transactions — movimientos escrow, comisiones acumuladas
+- /admin/partners — comercios activos + solicitudes pendientes
+- /admin/municipalities — municipios socios, sus poligonos y comisiones acumuladas
+
+Backend: endpoint GET /v1/admin/stats (SUPER_ADMIN)
+- Conductores activos hoy, viajes del dia, transacciones totales, comision acumulada
 ```
 
 **Entregables Fase 5:**
-- [ ] WalletScreen con saldo real, recarga y retiro
-- [ ] Integracion con al menos un PSP peruano (Culqi o Yape)
-- [ ] PanelScreen municipal mobile con metricas en tiempo real y mapa
-- [ ] DriversListScreen con gestion completa
-- [ ] web-admin refactorizado a React SPA
+- [ ] platform_config en DB — cero valores de negocio hardcodeados en codigo
+- [ ] Estimacion de tarifa por zonas en BookingScreen
+- [ ] Panel operador: CRUD de catalogo con busqueda de imagenes
+- [ ] Onboarding de partners (formulario + aprobacion en admin)
+- [ ] Billetera: recarga y retiro con PSP real
+- [ ] web-admin refactorizado con todos los modulos de administracion
+- [ ] 0 errores TypeScript · todos los tests pasando
 
 ---
 
-## Fase 6 — Hardening, Push Notifications, CI/CD
+## Fase 6 — Expansion geografica + Formalizacion SUNAT
 
-**Objetivo:** Preparar para produccion.
-**Duracion estimada:** 3-5 dias
+**Objetivo:** Habilitar el modelo de una sola app para multiples municipios y cumplimiento tributario.
+**Duracion estimada:** 7-10 dias
 
-### 6.1 Push notifications reales
+### 6.1 Tabla municipalities + asignacion geografica automatica
 ```
-- Integrar FCM (Android) + APNs (iOS) en notifications service
-- Notificaciones de: estado de viaje, pedido, billetera
-- Almacenar device tokens en BD
-- Eliminar push simulado, enviar notificaciones reales
-```
+DB:
+- municipalities(id, name, region, polygon GEOMETRY, commission_pct,
+                 contract_status, contact_name, contact_email, activated_at)
 
-### 6.2 Security hardening
-```
-- Rate limiting en gateway (100 req/min por IP)
-- Validacion y sanitizacion de inputs en todos los endpoints
-- HTTPS obligatorio en produccion
-- Variables de entorno auditadas (no hay secrets en codigo)
-- Implementar IDOR protection en todos los servicios
-- Revisar y aplicar principio de minimo privilegio por rol
+Logica en gateway:
+- Por cada transaccion completada: ST_Within(punto_gps, polygon)
+  → asigna municipality_id automaticamente
+- Si no hay municipio: municipality_id = 'unassigned' (MuniGo opera igual)
+
+No hay subdominios ni apps separadas.
+Una sola app para todo el Peru — el ciudadano ve lo que hay cerca de el.
 ```
 
-### 6.3 PostGIS para geo service
+### 6.2 Integracion SUNAT — comprobantes electronicos
 ```
-- Reemplazar distancia euclidiana por ST_Distance de PostGIS
-- Queries de conductores cercanos via ST_DWithin
-- Zonas geoespaciales reales de municipios peruanos
+CRITICO para formalizacion de mototaxistas.
+
+Proveedor OSE/PSE a contratar (ejemplos: Nubefact, Facturalo.pe, EFACT)
+Por cada trip completado:
+- MuniGo emite boleta electronica a SUNAT
+- Datos: servicio de transporte, monto, IGV, conductor, fecha
+- El conductor recibe copia por WhatsApp/email (opcional en MVP)
+
+Tabla: sunat_vouchers(id, trip_id, order_id, series, correlative,
+                       xml_content, cdr_content, status, issued_at)
+
+Endpoint interno: POST /v1/sunat/emit (llamado por transport al completar viaje)
 ```
 
-### 6.4 Observabilidad
+### 6.3 Registro formal de conductores (KYC basico)
 ```
-- Health checks en todos los microservicios
-- Logging estructurado (JSON) con nivel configurable
-- Metricas basicas: latencia, errores, throughput por servicio
-- Alertas por caida de servicios criticos
+Para cumplir regulacion de transporte peruano:
+- DNI verificado (foto frente + reverso)
+- Licencia de conducir vigente (foto)
+- Mototaxi con SOAT vigente (foto)
+- Placa del vehiculo
+- Numero de celular verificado (OTP SMS)
+
+DB: driver_documents(driver_id, doc_type, photo_url, verified, verified_by, expires_at)
+
+Frontend:
+- src/screens/driver/DriverVerificationScreen.tsx — subida de documentos
+Super Admin:
+- /admin/drivers/:id — revisar y aprobar documentos
 ```
 
-### 6.5 CI/CD
+### 6.4 Retiro de ganancias para conductores y operadores
 ```
-- GitHub Actions: lint + test en PR
-- Build Docker images en push a main
-- Deploy automatico a CapRover (ya tiene caprover-compose.yml)
-- Environment: staging y production separados
+Flujo completo post-escrow:
+- El escrow ya libera al balance del conductor (wallet service)
+- Conductor ve su saldo en DriverDashboard
+- Solicita retiro indicando CCI bancario
+- SUPER_ADMIN procesa en batch diario desde panel
+- Se registra en withdrawal_requests con estado PENDING → COMPLETED
+
+MVP: procesamiento manual por el SUPER_ADMIN
+Futuro: integracion con API bancaria para transferencias automaticas
 ```
 
 **Entregables Fase 6:**
-- [ ] Push notifications funcionando en dispositivos reales
-- [ ] Rate limiting y validaciones en todos los endpoints
-- [ ] PostGIS queries reales en geo service
-- [ ] Logging estructurado en todos los servicios
-- [ ] Pipeline CI/CD funcionando con deploy a staging
+- [ ] Tabla municipalities con poligonos activos
+- [ ] Asignacion automatica de municipality_id por GPS en cada transaccion
+- [ ] Reporte por municipio en Super Admin Panel
+- [ ] Emision de comprobantes electronicos SUNAT por viaje completado
+- [ ] KYC basico de conductores (documentos + aprobacion)
+- [ ] Flujo de retiro de ganancias para conductores y operadores
+
+---
+
+## Fase 7 — Hardening, Mapas reales, Push Notifications, CI/CD
+
+**Objetivo:** Preparar para produccion real con usuarios reales.
+**Duracion estimada:** 5-7 dias
+
+### 7.1 Mapas reales
+```
+- Mapbox GL o Google Maps en BookingScreen y TripTrackingScreen
+- Visualizacion del conductor moviendose en tiempo real
+- Calculo de ruta y ETA real
+- Mapa de conductores activos en Super Admin Panel
+```
+
+### 7.2 Push notifications reales
+```
+- FCM (Android) + APNs (iOS) en notifications service
+- Device tokens almacenados en DB por usuario
+- Notificaciones para: estado de viaje, estado de pedido, alerta SOS recibida,
+  retiro procesado, nuevo pedido (para operador)
+```
+
+### 7.3 Security hardening
+```
+- Rate limiting en gateway (100 req/min por IP, 10 req/min por endpoint sensible)
+- Validacion y sanitizacion de todos los inputs
+- HTTPS obligatorio (Let's Encrypt en CapRover)
+- Auditoria de variables de entorno — ningun secret en codigo
+- IDOR protection en todos los servicios
+- Principio de minimo privilegio por rol
+```
+
+### 7.4 PostGIS y geo real
+```
+- ST_Distance / ST_DWithin para conductores cercanos
+- ST_Within para asignacion de municipality_id
+- Indices espaciales en todos los campos GEOMETRY
+```
+
+### 7.5 Observabilidad y CI/CD
+```
+- Health checks /health en todos los microservicios
+- Logging estructurado JSON con nivel configurable
+- GitHub Actions: lint + test en cada PR
+- Build Docker + deploy automatico a CapRover en push a main
+- Environments: staging y production separados
+```
+
+**Entregables Fase 7:**
+- [ ] Mapa real funcionando en Booking y Tracking
+- [ ] Push notifications en dispositivos reales Android e iOS
+- [ ] Rate limiting activo en gateway
+- [ ] PostGIS queries en production
+- [ ] Pipeline CI/CD completo con staging y production
 
 ---
 
