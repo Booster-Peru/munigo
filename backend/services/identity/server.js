@@ -112,20 +112,25 @@ const initDb = async () => {
     )
   `);
 
-  // Optional operator seeding
-  const operatorEmail = process.env.OPERATOR_EMAIL;
-  const operatorPassword = process.env.OPERATOR_PASSWORD;
-  if (operatorEmail && operatorPassword) {
-    const existing = await query('SELECT id FROM users WHERE email = $1', [operatorEmail.toLowerCase()]);
-    if (existing.rowCount === 0) {
-      const hashed = await hashPassword(operatorPassword);
-      await query(
-        `
-          INSERT INTO users (id, dni, email, password_hash, role, full_name)
-          VALUES ($1, $2, $3, $4, 'OPERATOR', $5)
-        `,
-        [crypto.randomUUID(), '00000000', operatorEmail.toLowerCase(), hashed, 'MuniGo Admin']
-      );
+  // Seed system users from env vars
+  const seeds = [
+    { envEmail: 'OPERATOR_EMAIL', envPass: 'OPERATOR_PASSWORD', role: 'OPERATOR', name: 'MuniGo Operador', dni: '00000001' },
+    { envEmail: 'DRIVER_EMAIL',   envPass: 'DRIVER_PASSWORD',   role: 'DRIVER',   name: 'Conductor Demo',  dni: '00000002' },
+    { envEmail: 'ADMIN_EMAIL',    envPass: 'ADMIN_PASSWORD',    role: 'SUPER_ADMIN', name: 'Super Admin',  dni: '00000003' },
+  ];
+
+  for (const seed of seeds) {
+    const email = process.env[seed.envEmail];
+    const password = process.env[seed.envPass];
+    if (email && password) {
+      const existing = await query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+      if (existing.rowCount === 0) {
+        const hashed = await hashPassword(password);
+        await query(
+          `INSERT INTO users (id, dni, email, password_hash, role, full_name) VALUES ($1, $2, $3, $4, $5, $6)`,
+          [crypto.randomUUID(), seed.dni, email.toLowerCase(), hashed, seed.role, seed.name]
+        );
+      }
     }
   }
 };
@@ -157,13 +162,19 @@ const server = http.createServer(async (req, res) => {
       const passwordHash = await hashPassword(body.password);
       const dni = String(body.dni).trim();
 
+      // Only CITIZEN and DRIVER allowed from public register
+      const allowedPublicRoles = ['CITIZEN', 'DRIVER'];
+      const requestedRole = body.role && allowedPublicRoles.includes(String(body.role).toUpperCase())
+        ? String(body.role).toUpperCase()
+        : 'CITIZEN';
+
       const insert = await query(
         `
           INSERT INTO users (id, dni, email, full_name, role, password_hash)
-          VALUES ($1, $2, $3, $4, 'CITIZEN', $5)
+          VALUES ($1, $2, $3, $4, $5, $6)
           RETURNING id, dni, email, full_name, role, created_at
         `,
-        [id, dni, email, fullName, passwordHash],
+        [id, dni, email, fullName, requestedRole, passwordHash],
       );
 
       const user = sanitizeUser(insert.rows[0]);

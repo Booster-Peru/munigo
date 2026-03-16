@@ -8,6 +8,10 @@ const upstreams = {
   reports: process.env.REPORTS_URL || 'http://localhost:4002',
   geo: process.env.GEO_URL || 'http://localhost:4003',
   notifications: process.env.NOTIFICATIONS_URL || 'http://localhost:4004',
+  wallet: process.env.WALLET_URL || 'http://localhost:4006',
+  transport: process.env.TRANSPORT_URL || 'http://localhost:4005',
+  catalog: process.env.CATALOG_URL || 'http://localhost:4007',
+  orders: process.env.ORDERS_URL || 'http://localhost:4008',
 };
 
 const json = (res, statusCode, payload) => {
@@ -43,6 +47,14 @@ const routeForPath = (path) => {
   if (path === '/v1/geo') return upstreams.geo;
   if (path.startsWith('/v1/notifications/')) return upstreams.notifications;
   if (path === '/v1/notifications') return upstreams.notifications;
+  if (path.startsWith('/v1/wallet/')) return upstreams.wallet;
+  if (path === '/v1/wallet') return upstreams.wallet;
+  if (path.startsWith('/v1/transport/')) return upstreams.transport;
+  if (path === '/v1/transport') return upstreams.transport;
+  if (path.startsWith('/v1/catalog/')) return upstreams.catalog;
+  if (path === '/v1/catalog') return upstreams.catalog;
+  if (path.startsWith('/v1/orders/')) return upstreams.orders;
+  if (path === '/v1/orders') return upstreams.orders;
   return null;
 };
 

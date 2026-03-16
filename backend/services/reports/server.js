@@ -1,7 +1,7 @@
 const http = require('node:http');
 const { URL } = require('node:url');
 const { query } = require('../../shared/db');
-const { verifyAccessToken } = require('../../shared/auth');
+const { verifyAccessToken } = require('../../shared/jwt');
 
 const PORT = Number(process.env.REPORTS_PORT || 4002);
 

@@ -16,7 +16,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/navigation';
 import { theme } from '../config/theme';
 import { Button } from '../components/common/Button';
-import { Mail, Lock, User, ArrowLeft, Phone } from 'lucide-react-native';
+import { Mail, Lock, User, ArrowLeft, CreditCard } from 'lucide-react-native';
 import { Alert } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 
@@ -27,22 +27,22 @@ const RegisterScreen = () => {
   const { register } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [dni, setDni] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !dni) {
       Alert.alert(
         'Error',
-        'Por favor completa los campos obligatorios (Nombre, Email y Contraseña)',
+        'Por favor completa todos los campos (Nombre, Email, DNI y Contraseña)',
       );
       return;
     }
 
     setIsLoading(true);
     try {
-      await register(name, email, password, phone);
+      await register(name, email, password, dni);
       Alert.alert('Registro exitoso', 'Tu cuenta ha sido creada correctamente', [
         {
           text: 'Continuar',
@@ -121,15 +121,16 @@ const RegisterScreen = () => {
 
               <View style={styles.inputContainer}>
                 <View style={styles.inputIcon}>
-                  <Phone color={theme.colors.textSecondary} size={20} />
+                  <CreditCard color={theme.colors.textSecondary} size={20} />
                 </View>
                 <TextInput
                   style={styles.input}
-                  placeholder="Teléfono (opcional)"
+                  placeholder="DNI"
                   placeholderTextColor={theme.colors.textSecondary}
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
+                  value={dni}
+                  onChangeText={setDni}
+                  keyboardType="numeric"
+                  maxLength={8}
                 />
               </View>
 

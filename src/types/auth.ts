@@ -1,9 +1,9 @@
 export interface User {
   id: string;
-  name: string;
+  fullName: string;
   email: string;
-  role: 'CITIZEN' | 'OPERATOR' | 'SUPERVISOR' | 'ADMIN';
-  phone?: string;
+  dni: string;
+  role: 'CITIZEN' | 'DRIVER' | 'OPERATOR' | 'SUPER_ADMIN';
   createdAt: string;
 }
 

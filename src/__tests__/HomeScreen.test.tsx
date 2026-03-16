@@ -4,7 +4,6 @@ import HomeScreen from '../screens/HomeScreen';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
 
-// Mocking hooks or external libraries if necessary
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
 }));
@@ -13,17 +12,11 @@ jest.mock('../hooks/useAuth', () => ({
   useAuth: jest.fn(),
 }));
 
-// Mocking icon library to avoid rendering issues in tests
 jest.mock('lucide-react-native', () => ({
-  Bell: 'Bell',
   Search: 'Search',
+  Bell: 'Bell',
   MapPin: 'MapPin',
-  TrendingUp: 'TrendingUp',
-  CheckCircle2: 'CheckCircle2',
-  Clock: 'Clock',
   Plus: 'Plus',
-  Zap: 'Zap',
-  ChevronRight: 'ChevronRight',
 }));
 
 describe('HomeScreen', () => {
@@ -32,20 +25,24 @@ describe('HomeScreen', () => {
       navigate: jest.fn(),
     });
     (useAuth as jest.Mock).mockReturnValue({
-      user: { name: 'Test User' },
+      user: { fullName: 'Test User' },
     });
   });
 
-  it('renders correctly with user name', () => {
+  it('renders greeting with first name', () => {
     const { getByText } = render(<HomeScreen />);
-    expect(getByText('Hola, Test User')).toBeTruthy();
-    expect(getByText('Ciudad Satélite, MX')).toBeTruthy();
+    expect(getByText('Hola, Test')).toBeTruthy();
   });
 
-  it('renders stats badges', () => {
-    const { getByText, getAllByText } = render(<HomeScreen />);
-    expect(getByText('Reportes')).toBeTruthy();
-    expect(getByText('Resueltos')).toBeTruthy();
-    expect(getAllByText('En curso').length).toBeGreaterThan(0);
+  it('renders module grid labels', () => {
+    const { getByText } = render(<HomeScreen />);
+    expect(getByText('Transporte')).toBeTruthy();
+    expect(getByText('Restaurantes')).toBeTruthy();
+    expect(getByText('Billetera')).toBeTruthy();
+  });
+
+  it('renders location text', () => {
+    const { getByText } = render(<HomeScreen />);
+    expect(getByText('Canoas de Punta Sal')).toBeTruthy();
   });
 });

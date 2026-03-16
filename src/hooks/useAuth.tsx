@@ -4,9 +4,10 @@ import { authService } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
+  token: string;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
+  register: (fullName: string, email: string, password: string, dni: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -14,6 +15,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
+        setToken(authService.getAccessToken());
       } catch {
         // Failed to load persisted user — fall through to null
       } finally {
@@ -33,20 +36,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     const response = await authService.login(email, password);
     setUser(response.user);
+    setToken(authService.getAccessToken());
   };
 
-  const register = async (name: string, email: string, password: string, phone?: string) => {
-    const response = await authService.register(name, email, password, phone);
+  const register = async (fullName: string, email: string, password: string, dni: string) => {
+    const response = await authService.register(fullName, email, password, dni);
     setUser(response.user);
+    setToken(authService.getAccessToken());
   };
 
   const logout = async () => {
     await authService.logout();
     setUser(null);
+    setToken('');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

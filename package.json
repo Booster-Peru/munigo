@@ -12,6 +12,7 @@
     "svc:reports": "node backend/services/reports/server.js",
     "svc:geo": "node backend/services/geo/server.js",
     "svc:notifications": "node backend/services/notifications/server.js",
+    "svc:wallet": "node backend/services/wallet/server.js",
     "web:admin": "node web-admin/server.js",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "typecheck": "tsc --noEmit",
@@ -19,6 +20,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@expo/metro-runtime": "^55.0.6",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/native": "^7.1.33",
@@ -33,11 +35,13 @@
     "lucide-react-native": "^0.577.0",
     "pg": "^8.20.0",
     "react": "19.2.0",
+    "react-dom": "^19.2.0",
     "react-native": "0.83.2",
     "react-native-gesture-handler": "^2.30.0",
     "react-native-safe-area-context": "^5.7.0",
     "react-native-screens": "^4.24.0",
-    "react-native-svg": "15.15.3"
+    "react-native-svg": "15.15.3",
+    "react-native-web": "^0.21.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -1,6 +1,6 @@
 # PLAN.md — Plan de Ejecucion MuniGo
 
-> Plan operativo basado en specs.md v3.0.0 (57 pantallas Stitch analizadas el 2026-03-15).
+> Plan operativo basado en specs.md v3.1.0 (57 pantallas Stitch, decisiones confirmadas el 2026-03-15).
 > Todo trabajo de codigo debe iniciarse con este plan como referencia.
 
 ---
@@ -11,7 +11,7 @@ MuniGo pasa de ser un sistema de reportes ciudadanos a una **super-app de servic
 
 - **Mantener:** Auth, navigation base, ProfileScreen (con cambios), design tokens corregidos
 - **Rediseñar:** HomeScreen (hub de 6 modulos), navegacion principal
-- **Crear:** 7 nuevos modulos (Transporte, Restaurantes, Tiendas, Mandados, Billetera, Mascotas, SOS)
+- **Crear:** 5 nuevos modulos (Transporte, Servicios [Restaurantes+Tiendas+Mandados], Billetera, Mascotas, SOS)
 - **Crear:** Driver App (perfil DRIVER dentro del mismo repo Expo)
 - **Crear:** 7 nuevos microservicios (transport, wallet, catalog, orders, mandados, pets, sos)
 - **Refactorizar:** web-admin a React SPA con roles y nuevas funcionalidades
@@ -50,18 +50,21 @@ Cambios:
 - Agregar seed de operador de prueba: operador@restaurante.pe
 ```
 
-### 0.4 Crear microservicio wallet (schema + CRUD basico)
+### 0.4 Crear microservicio wallet (escrow)
 ```
-Nuevo archivo: backend/services/wallet/server.js (puerto 4006)
+COMPLETADO: backend/services/wallet/server.js (puerto 4006)
 Tablas:
-- wallets(user_id PK, balance DECIMAL, updated_at)
-- wallet_transactions(id, user_id, type, amount, description, reference_id, created_at)
-- withdrawal_requests(id, user_id, amount, bank_account, status, created_at)
-Endpoints iniciales:
-- GET /v1/wallet — obtener saldo y ultimos movimientos
-- POST /v1/wallet/debit — debitar saldo (para pagos de servicios)
-- POST /v1/wallet/credit — acreditar saldo (para recargas)
-- GET /v1/wallet/transactions — historial de movimientos
+- wallets(user_id PK, balance DECIMAL, currency, updated_at)
+- wallet_transactions(id, user_id, type, amount, balance_after, ...) — APPEND ONLY
+- escrow_holds(id, payer_user_id, beneficiary_user_id, amount, platform_fee, net_amount, status)
+Endpoints:
+- GET /v1/wallet — saldo + ultimas transacciones
+- POST /v1/wallet/credit — acreditar (recarga via Culqi)
+- POST /v1/wallet/debit — debitar saldo
+- POST /v1/wallet/escrow/hold — retener fondos para servicio
+- POST /v1/wallet/escrow/release — liberar al partner post-servicio
+- POST /v1/wallet/escrow/refund — reembolsar al ciudadano (cancelacion)
+- GET /v1/wallet/transactions — historial paginado
 ```
 
 ### 0.5 Actualizar gateway con rutas nuevas
@@ -80,12 +83,12 @@ Archivo: docker-compose.yml
 Agregar servicios: wallet, transport, catalog, orders, mandados, pets, sos
 ```
 
-**Entregables Fase 0:**
-- [ ] Bug de reports resuelto y testeado
-- [ ] Design tokens actualizados y aplicados
-- [ ] Roles DRIVER y OPERATOR en identity
-- [ ] Servicio wallet funcionando con endpoints basicos
-- [ ] Gateway actualizado
+**Entregables Fase 0:** ✅ COMPLETADA
+- [x] Bug de reports resuelto (shared/auth → shared/jwt)
+- [x] Design tokens actualizados (#0f49bd, #facc15, #dc2626, light mode)
+- [x] Roles DRIVER, OPERATOR, SUPER_ADMIN en identity (seeds incluidos)
+- [x] Servicio wallet con escrow completo (hold/release/refund) en puerto 4006
+- [x] Gateway actualizado con rutas wallet/transport/catalog/orders
 
 ---
 
@@ -100,9 +103,9 @@ Archivo: src/navigation/AppNavigation.tsx
 Cambios:
 - RootStack: Auth (Welcome/Login/Register) → MainApp (por rol)
 - MainApp condicional por rol JWT:
-  - CITIZEN → CitizenTabs
-  - DRIVER → DriverTabs
-  - SUPERVISOR → MunicipalTabs (+ funcionalidades ciudadano)
+  - CITIZEN → CitizenTabs (Inicio, Servicios, [+], Billetera, Perfil)
+  - DRIVER → DriverDashboard directo
+  - SUPER_ADMIN → redirigir a web-admin
 ```
 
 ### 1.2 CitizenTabs (Bottom Navigation ciudadano)
@@ -136,10 +139,15 @@ src/components/common/SOSButton.tsx — boton de emergencia rojo
 src/components/layout/ScreenHeader.tsx — header con ubicacion + notificaciones
 ```
 
-**Entregables Fase 1:**
-- [ ] Navigation reestructurada y funcionando por roles
-- [ ] HomeScreen con 6 modulos, saludo, ubicacion, banner y SOS
-- [ ] Componentes base del design system creados
+**Entregables Fase 1:** ✅ COMPLETADA
+- [x] Navigation role-aware: CITIZEN → 4 tabs (Inicio/Viajes/Comunidad/Perfil), DRIVER → DriverDashboard
+- [x] Pantallas creadas y alineadas a Stitch: BookingScreen, ServicesScreen (Restaurantes+Tiendas), SOSScreen, DriverDashboardScreen, WalletScreen
+- [x] Tipos y auth sincronizados con backend (fullName, dni, roles correctos)
+- [x] HomeScreen rediseñado con 6 modulos (Transporte, Restaurantes, Tiendas, Mandados, Mascotas, Billetera)
+- [x] Componentes ModuleCard, BannerCard, SOSButton creados
+- [x] ProfileScreen alineado a Stitch (Ionicons, Método de pago, Mi Actividad)
+- [x] Todas las pantallas verificadas contra Stitch: structura idéntica, línea gráfica consistente
+- [x] 0 errores TypeScript, 15/15 tests pasando
 
 ---
 
@@ -175,7 +183,7 @@ Endpoints:
 src/screens/transport/BookingScreen.tsx
 - Mapa con marker de origen y destino (Google Maps o Mapbox)
 - Cards de tipo: Standard S/5 | Premium S/8 con tiempo estimado
-- Selector de pago: Efectivo | Billetera (muestra saldo disponible)
+- Pago: Billetera MuniGo UNICO (sin efectivo — modelo escrow, muestra saldo disponible)
 - Campo cupon opcional
 - CTA "Solicitar Mototaxi"
 
@@ -234,12 +242,18 @@ src/services/driverService.ts
 - completeTrip(tripId)
 ```
 
-**Entregables Fase 2:**
-- [ ] Microservicio transport con todos los endpoints + WebSocket
-- [ ] BookingScreen con mapa, tipos de mototaxi y pago
-- [ ] TripTrackingScreen con WebSocket en tiempo real
-- [ ] DriverDashboardScreen con toggle de disponibilidad
-- [ ] Flujo completo ciudadano → conductor funcionando
+**Entregables Fase 2:** ✅ COMPLETADA
+- [x] Microservicio transport (puerto 4005) con todos los endpoints + WebSocket tracking
+- [x] BookingScreen conectada al API (requestTrip → TripConfirmation)
+- [x] TripConfirmationScreen — estado buscando + cancelar
+- [x] TripTrackingScreen — mapa placeholder + WebSocket + acción conductor
+- [x] TripSummaryScreen — recap tarifa + rating de 5 estrellas
+- [x] TripHistoryScreen — lista paginada de viajes con badges de estado
+- [x] TripRequestScreen — modal conductor (aceptar / rechazar)
+- [x] transportService.ts + driverService.ts — todas las llamadas al API
+- [x] useAuth expone token; AppNavigation registra todas las rutas nuevas
+- [x] docker-compose: servicio transport en puerto 4005
+- [x] 0 errores TypeScript · 15/15 tests pasando
 
 ---
 
@@ -291,19 +305,28 @@ src/screens/operator/RestaurantPanelScreen.tsx
 - Boton de retiro de ganancias
 ```
 
-**Entregables Fase 3:**
-- [ ] Microservicios catalog + orders funcionando
-- [ ] Flujo completo ciudadano food delivery
-- [ ] Panel operador restaurante con gestion de pedidos
+**Entregables Fase 3:** ✅ COMPLETADA
+- [x] catalog/server.js (puerto 4007): restaurants, menu_items, stores, products + seed demo data
+- [x] orders/server.js (puerto 4008): máquina de estados PENDING→DELIVERED, transiciones REST
+- [x] catalogService.ts + ordersService.ts — todas las llamadas al API
+- [x] RestaurantListScreen — lista con filtros de categoría conectada al catalog API
+- [x] RestaurantMenuScreen — carta agrupada por categoría + carrito inline + CTA PEDIR
+- [x] OrderConfirmationScreen — detalle del pedido confirmado + CTA seguir
+- [x] OrderTrackingScreen — 6 pasos de progreso, polling cada 8s, cancelación
+- [x] OrderDeliveredScreen — confirmación + rating 5 estrellas
+- [x] RestaurantPanelScreen — panel operador con avance de estado en tiempo real
+- [x] ServicesScreen navega a RestaurantMenu/StoreProducts por tipo
+- [x] docker-compose: catalog (4007) + orders (4008)
+- [x] 0 errores TypeScript · 15/15 tests pasando
 
 ---
 
-## Fase 4 — Tiendas + Mandados + Mascotas + SOS
+## Fase 4 — Tiendas + Mandados + Mascotas + SOS ✅ COMPLETADA
 
+**Completado:** 2026-03-16
 **Objetivo:** Completar todos los modulos de servicios.
-**Duracion estimada:** 5-7 dias
 
-### 4.1 Tiendas SIAR Marketplace
+### 4.1 Tiendas (categoria dentro de modulo Servicios)
 ```
 Backend: endpoint tiendas en catalog service (ya creado en Fase 3)
 Frontend:
@@ -352,16 +375,20 @@ Frontend:
 ```
 
 **Entregables Fase 4:**
-- [ ] Tiendas SIAR funcionales (reutilizando catalog + orders)
-- [ ] Modulo Mandados end-to-end
-- [ ] Listado y adopcion de mascotas
-- [ ] SOSScreen con boton panico + contactos de emergencia
+- [x] Tiendas funcionales (StoreListScreen + StoreProductsScreen con carrito inline, reutiliza catalog + orders)
+- [x] Modulo Mandados end-to-end: backend/services/mandados/server.js (puerto 4009) + 5 pantallas + mandadosService.ts
+- [x] Mascotas: backend/services/pets/server.js (puerto 4010) + PetListScreen (adopcion+perdidas) + PetDetailScreen + petsService.ts
+- [x] SOS: backend/services/sos/server.js (puerto 4011) + SOSScreen conectado a POST /v1/sos/alert + sosService.ts
+- [x] docker-compose actualizado con mandados/pets/sos (puertos 4009-4011)
+- [x] navigation.ts actualizado con todas las rutas nuevas
+- [x] HomeScreen: tiles Mandados y Mascotas activos (eliminado disabled/badge 'Pronto')
+- [x] 0 errores TypeScript · 15/15 tests pasando
 
 ---
 
-## Fase 5 — Billetera completa + Panel Municipal
+## Fase 5 — Billetera completa + Super Admin Web
 
-**Objetivo:** Billetera con recargas reales y panel municipal mobile.
+**Objetivo:** Billetera con recargas reales via Culqi y refactor completo del web-admin.
 **Duracion estimada:** 5-7 dias
 
 ### 5.1 Billetera completa
@@ -379,31 +406,25 @@ Integraciones de pago:
 - Tarjeta Visa/MC (via Culqi u otro PSP peruano)
 ```
 
-### 5.2 Panel Municipal Mobile
+### 5.2 Super Admin Panel (web-admin)
 ```
-Frontend:
-- src/screens/municipal/PanelScreen.tsx
-  - Cards con metricas en tiempo real (conductores, viajes, transacciones, comision)
-  - Mapa con conductores activos geolocalizados
-  - Estado de subsistemas
-- src/screens/municipal/DriversListScreen.tsx
-  - Lista de conductores registrados con estado
-  - Botones: ver detalle, suspender, reactivar
-- src/screens/municipal/DriverDetailScreen.tsx
-  - Datos del conductor, documentacion, historial de viajes
-- src/navigation/MunicipalNavigation.tsx
-  - Tabs: Panel | Conductores | Viajes | Ajustes
+Acceso: web-admin React SPA, ruta /admin, requiere rol SUPER_ADMIN
+Paginas:
+- /admin/dashboard — metricas en tiempo real (conductores, viajes, transacciones, comision)
+- /admin/drivers — lista de conductores, estado, suspender/reactivar
+- /admin/trips — historial de viajes con filtros
+- /admin/transactions — movimientos financieros, escrow, comisiones
 
-Backend: nuevo endpoint GET /v1/transport/supervisor/stats
-- Requiere rol SUPERVISOR
-- Retorna: conductores activos, viajes del dia, transacciones, comision
+Backend: nuevo endpoint GET /v1/transport/admin/stats
+- Requiere rol SUPER_ADMIN
+- Retorna: conductores activos, viajes del dia, transacciones totales, comision acumulada
 ```
 
 ### 5.3 Refactor web-admin
 ```
 web-admin/ — refactor a React SPA (Vite + React)
 Modulos:
-- Login con roles (SUPERVISOR, ADMIN)
+- Login con rol SUPER_ADMIN (JWT verificado)
 - Dashboard con metricas
 - Mapa de conductores activos (Google Maps)
 - Gestion de conductores (listar, suspender, reactivar)

@@ -51,17 +51,17 @@ export const authService = {
   },
 
   register: async (
-    name: string,
+    fullName: string,
     email: string,
     password: string,
-    phone?: string,
+    dni: string,
   ): Promise<AuthResponse> => {
     const response = await fetch(`${API_BASE_URL}/v1/auth/register`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ name, email, password, phone }),
+      body: JSON.stringify({ fullName, email, password, dni }),
     });
 
     if (!response.ok) {

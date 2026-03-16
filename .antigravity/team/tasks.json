@@ -1,90 +1,29 @@
 {
   "tasks": [
-    {
-      "id": "task-001",
-      "title": "Configuracion base del proyecto",
-      "assignee": "Director",
-      "dependencies": [],
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "id": "task-002",
-      "title": "Plan maestro integral actualizado",
-      "assignee": "Architect",
-      "dependencies": ["task-001"],
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "id": "task-003",
-      "title": "Hardening auth y sesiones",
-      "assignee": "Backend",
-      "dependencies": ["task-002"],
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "id": "task-004",
-      "title": "Autorizacion por recurso reportes",
-      "assignee": "Backend",
-      "dependencies": ["task-003"],
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "id": "task-005",
-      "title": "Web admin roles y guardas",
-      "assignee": "Frontend",
-      "dependencies": ["task-003"],
-      "status": "in-progress",
-      "priority": "high"
-    },
-    {
-      "id": "task-006",
-      "title": "OpenAPI v1 contratos base",
-      "assignee": "Architect",
-      "dependencies": ["task-004"],
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "id": "task-007",
-      "title": "Pipeline CI calidad",
-      "assignee": "Reviewer",
-      "dependencies": ["task-005"],
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "id": "task-008",
-      "title": "Geovisor operativo fase 1",
-      "assignee": "Frontend",
-      "dependencies": ["task-006"],
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "id": "task-009",
-      "title": "SLA y alertas operativas",
-      "assignee": "Backend",
-      "dependencies": ["task-006"],
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "id": "task-010",
-      "title": "Cierre iteracion y reporte Booster",
-      "assignee": "Director",
-      "dependencies": ["task-003", "task-004", "task-005"],
-      "status": "pending",
-      "priority": "high"
-    }
+    {"id":"v3-001","title":"Actualizar specs.md y PLAN.md con decisiones v3.0","assignee":"Director","dependencies":[],"status":"in-progress","priority":"high"},
+    {"id":"v3-002","title":"Fix bug reports service (shared/auth to shared/jwt)","assignee":"Backend","dependencies":[],"status":"in-progress","priority":"high"},
+    {"id":"v3-003","title":"Agregar roles DRIVER OPERATOR SUPER_ADMIN al identity service","assignee":"Backend","dependencies":[],"status":"in-progress","priority":"high"},
+    {"id":"v3-004","title":"Crear microservicio wallet con logica escrow","assignee":"Backend","dependencies":[],"status":"in-progress","priority":"high"},
+    {"id":"v3-005","title":"Actualizar gateway con rutas de nuevos servicios","assignee":"Backend","dependencies":["v3-004"],"status":"in-progress","priority":"high"},
+    {"id":"v3-006","title":"Actualizar design tokens theme.ts","assignee":"Frontend","dependencies":[],"status":"in-progress","priority":"high"},
+    {"id":"v3-007","title":"Crear componentes base ModuleCard SOSButton BannerCard","assignee":"Frontend","dependencies":["v3-006"],"status":"in-progress","priority":"high"},
+    {"id":"v3-008","title":"Redisenar HomeScreen con 6 modulos segun Stitch","assignee":"Frontend","dependencies":["v3-007"],"status":"in-progress","priority":"high"},
+    {"id":"v3-009","title":"Actualizar AppNavigation con routing por roles","assignee":"Frontend","dependencies":["v3-008"],"status":"in-progress","priority":"high"},
+    {"id":"v3-010","title":"Crear BookingScreen Transport Mototaxi","assignee":"Frontend","dependencies":["v3-009"],"status":"completed","priority":"high"},
+    {"id":"v3-011","title":"Crear ServicesScreen Restaurantes Tiendas Mandados","assignee":"Frontend","dependencies":["v3-009"],"status":"completed","priority":"high"},
+    {"id":"v3-012","title":"Crear SOSScreen con boton de panico","assignee":"Frontend","dependencies":["v3-009"],"status":"completed","priority":"high"},
+    {"id":"v3-013","title":"Crear DriverDashboardScreen","assignee":"Frontend","dependencies":["v3-009"],"status":"completed","priority":"high"},
+    {"id":"v3-014","title":"Crear WalletScreen","assignee":"Frontend","dependencies":["v3-009"],"status":"completed","priority":"high"},
+    {"id":"v3-015","title":"Integrar todas las pantallas en AppNavigation","assignee":"Frontend","dependencies":["v3-008","v3-010","v3-011","v3-012","v3-013","v3-014"],"status":"pending","priority":"high"},
+    {"id":"v3-016","title":"Verificar compilacion y corregir errores TypeScript","assignee":"Reviewer","dependencies":["v3-015"],"status":"pending","priority":"high"},
+    {"id":"v3-017","title":"Deploy y demo en emulador","assignee":"Director","dependencies":["v3-016"],"status":"pending","priority":"high"}
   ],
   "active_locks": [
-    {
-      "owner": "Frontend",
-      "file": "web-admin/main.js"
-    }
+    {"owner":"Backend-Agent","file":"backend/services/reports/server.js"},
+    {"owner":"Backend-Agent","file":"backend/services/identity/server.js"},
+    {"owner":"Backend-Agent","file":"backend/gateway/server.js"},
+    {"owner":"Frontend-Agent","file":"src/config/theme.ts"},
+    {"owner":"Frontend-Agent","file":"src/navigation/AppNavigation.tsx"},
+    {"owner":"Frontend-Agent","file":"src/screens/HomeScreen.tsx"}
   ]
 }

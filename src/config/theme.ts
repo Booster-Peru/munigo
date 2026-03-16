@@ -1,13 +1,15 @@
 export const palette = {
-  primary: '#135bec',
-  background: '#0a0a0b',
-  surface: '#121214',
-  text: '#ffffff',
-  textSecondary: '#a1a1aa',
-  border: '#27272a',
-  accent: '#3b82f6',
+  primary: '#0f49bd',
+  background: '#f8fafc',
+  surface: '#ffffff',
+  text: '#1e293b',
+  textSecondary: '#64748b',
+  border: '#e2e8f0',
+  accent: '#facc15',
+  emergency: '#dc2626',
   error: '#ef4444',
   success: '#10b981',
+  onSurface: '#1e293b',
 };
 
 export const shadows = {

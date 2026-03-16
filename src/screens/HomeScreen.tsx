@@ -1,173 +1,128 @@
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { RootStackParamList, DashboardParamList } from '../types/navigation';
-import { theme } from '../config/theme';
 import {
-  Bell,
-  Search,
-  MapPin,
-  TrendingUp,
-  CheckCircle2,
-  Clock,
-  Plus,
-  Zap,
-} from 'lucide-react-native';
-import { ImageBackground } from 'react-native';
-import { ReportCard } from '../components/reports/ReportCard';
-import { SectionHeader } from '../components/common/SectionHeader';
-import { StatBadge } from '../components/common/StatBadge';
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
+import { theme } from '../config/theme';
+import { Search } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ModuleCard } from '../components/common/ModuleCard';
+import { BannerCard } from '../components/common/BannerCard';
 import { useAuth } from '../hooks/useAuth';
-import heroImage from '../assets/images/hero.png';
 
-type HomeScreenNavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<DashboardParamList, 'Main'>,
-  StackNavigationProp<RootStackParamList>
->;
+type HomeNavProp = StackNavigationProp<RootStackParamList>;
+
+const MODULES = [
+  {
+    key: 'transport',
+    label: 'Transporte',
+    icon: <Ionicons name="bicycle" size={26} color={theme.colors.primary} />,
+    onPress: (nav: HomeNavProp) => nav.navigate('Booking'),
+  },
+  {
+    key: 'restaurants',
+    label: 'Restaurantes',
+    icon: <Ionicons name="restaurant" size={26} color="#059669" />,
+    onPress: (nav: HomeNavProp) => nav.navigate('Services', { type: 'restaurantes' }),
+  },
+  {
+    key: 'shops',
+    label: 'Tiendas',
+    icon: <Ionicons name="storefront" size={26} color="#7c3aed" />,
+    onPress: (nav: HomeNavProp) => nav.navigate('Services', { type: 'tiendas' }),
+  },
+  {
+    key: 'mandados',
+    label: 'Te hago un favor',
+    icon: <Ionicons name="bicycle-outline" size={26} color="#f59e0b" />,
+    onPress: (nav: HomeNavProp) => nav.navigate('MandadosMenu'),
+  },
+  {
+    key: 'pets',
+    label: 'Mascotas',
+    icon: <Ionicons name="paw" size={26} color="#ef4444" />,
+    onPress: (nav: HomeNavProp) => nav.navigate('PetList'),
+  },
+  {
+    key: 'wallet',
+    label: 'Billetera',
+    icon: <Ionicons name="wallet" size={26} color={theme.colors.primary} />,
+    onPress: (nav: HomeNavProp) => nav.navigate('Wallet'),
+  },
+];
 
 const HomeScreen = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const navigation = useNavigation<HomeNavProp>();
   const { user } = useAuth();
-
-  const stats = [
-    { label: 'Reportes', value: '12', icon: MapPin, color: '#3B82F6' },
-    { label: 'Resueltos', value: '8', icon: CheckCircle2, color: '#10B981' },
-    { label: 'En curso', value: '4', icon: Clock, color: '#F59E0B' },
-  ];
-
-  const recentReports = [
-    {
-      id: '1',
-      title: 'Bache profundo en Av. Central',
-      category: 'Infraestructura',
-      status: 'En curso',
-      date: 'Hace 2 horas',
-      votes: 24,
-    },
-    {
-      id: '2',
-      title: 'Luminaria fundida',
-      category: 'Servicios',
-      status: 'Resuelto',
-      date: 'Ayer',
-      votes: 12,
-    },
-  ];
+  const firstName = user?.fullName?.split(' ')[0] || 'Vecino';
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.menuBtn} activeOpacity={0.7}>
+          <Ionicons name="menu" size={22} color={theme.colors.text} />
+        </TouchableOpacity>
 
-      {/* Hero Section with Image Background */}
-      <ImageBackground
-        source={heroImage}
-        style={styles.heroBackground}
-        imageStyle={styles.heroImage}
-      >
-        <SafeAreaView edges={['top']}>
-          <View style={styles.headerContent}>
-            <View>
-              <Text style={styles.greeting}>Hola, {user?.name || 'Invitado'}</Text>
-              <View style={styles.locationContainer}>
-                <MapPin size={14} color={theme.colors.accent} />
-                <Text style={styles.locationText}>Ciudad Satélite, MX</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={styles.notificationButton} activeOpacity={0.7}>
-              <Bell size={22} color="white" />
-              <View style={styles.notificationBadge} />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-
-        <View style={styles.heroOverlay}>
-          <Text style={styles.heroTitle}>Mejora tu comunidad hoy</Text>
-          <Text style={styles.heroSubtitle}>Reporta incidencias y mantente informado.</Text>
+        <View style={styles.logoPill}>
+          <Text style={styles.logoText}>MuniGo</Text>
         </View>
-      </ImageBackground>
+
+        <TouchableOpacity style={styles.bellBtn} activeOpacity={0.7}>
+          <Ionicons name="notifications" size={22} color={theme.colors.accent} />
+        </TouchableOpacity>
+      </View>
 
       <ScrollView
+        style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
       >
-        {/* Glassmorphism Search Bar */}
-        <View style={styles.stickyHeader}>
-          <TouchableOpacity style={styles.searchBar} activeOpacity={0.9}>
-            <Search size={20} color={theme.colors.textSecondary} />
-            <Text style={styles.searchText}>Buscar reportes o categorías...</Text>
-          </TouchableOpacity>
+        {/* Greeting + location */}
+        <View style={styles.greetingRow}>
+          <Text style={styles.greeting}>Hola, {firstName}</Text>
+          <View style={styles.locationRow}>
+            <Ionicons name="location-sharp" size={13} color={theme.colors.primary} />
+            <Text style={styles.locationText}>Canoas de Punta Sal</Text>
+          </View>
         </View>
 
-        {/* Quick Actions / Stats */}
-        <View style={styles.badgeContainer}>
-          {stats.map((stat, index) => (
-            <StatBadge key={index} label={stat.label} value={stat.value} color={stat.color} />
+        {/* Search bar */}
+        <TouchableOpacity style={styles.searchBar} activeOpacity={0.8}>
+          <Search size={18} color={theme.colors.textSecondary} />
+          <Text style={styles.searchText}>¿Qué necesitas hoy?</Text>
+        </TouchableOpacity>
+
+        {/* Modules grid 2x3 */}
+        <View style={styles.grid}>
+          {MODULES.map((mod) => (
+            <View key={mod.key} style={styles.gridCell}>
+              <ModuleCard
+                icon={mod.icon}
+                label={mod.label}
+                onPress={() => mod.onPress(navigation)}
+              />
+            </View>
           ))}
         </View>
 
-        {/* Categories Section */}
-        <View style={styles.sectionContainer}>
-          <SectionHeader title="Categorías" onPress={() => {}} />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoriesScroll}
-            contentContainerStyle={styles.categoriesContent}
-          >
-            {['Vialidad', 'Servicios', 'Seguridad', 'Limpieza', 'Parques'].map((cat, i) => (
-              <TouchableOpacity key={i} style={styles.categoryChip}>
-                <Text style={styles.categoryChipText}>{cat}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+        {/* Municipal banner */}
+        <BannerCard
+          title="Nuevos horarios de recolección"
+          subtitle="Conoce las rutas de limpieza en tu sector."
+          variant="info"
+        />
 
-        {/* Recent Reports */}
-        <View style={styles.sectionContainer}>
-          <SectionHeader
-            title="Reportes recientes"
-            onPress={() => navigation.navigate('Reports')}
-          />
-          <View style={styles.reportsList}>
-            {recentReports.map((report) => (
-              <ReportCard key={report.id} report={report} onPress={() => {}} />
-            ))}
-          </View>
-        </View>
-
-        {/* Community Impact Card */}
-        <View style={styles.impactCard}>
-          <View style={styles.impactContent}>
-            <View style={styles.impactHeader}>
-              <Zap size={16} color="white" fill="white" />
-              <Text style={styles.impactTitle}>Tu impacto social</Text>
-            </View>
-            <Text style={styles.impactSubtitle}>
-              Has ayudado a resolver 3 problemas en tu zona.
-            </Text>
-            <TouchableOpacity style={styles.impactButton}>
-              <Text style={styles.impactButtonText}>Ver mis logros</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.impactIconCircle}>
-            <TrendingUp size={32} color="white" />
-          </View>
-        </View>
+        <View style={{ height: 16 }} />
       </ScrollView>
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        activeOpacity={0.9}
-        onPress={() => navigation.navigate('CreateReport')}
-      >
-        <Plus size={28} color="white" />
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -176,202 +131,85 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  heroBackground: {
-    height: 280,
-    justifyContent: 'space-between',
-    paddingBottom: theme.spacing.xl,
-  },
-  heroImage: {
-    opacity: 0.6,
-  },
-  heroOverlay: {
-    paddingHorizontal: theme.spacing.l,
-    marginBottom: theme.spacing.m,
-  },
-  heroTitle: {
-    ...theme.typography.h1,
-    color: 'white',
-    letterSpacing: -0.5,
-  },
-  heroSubtitle: {
-    ...theme.typography.body,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 4,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.l,
-    paddingTop: theme.spacing.m,
-  },
-  greeting: {
-    ...theme.typography.h3,
-    color: 'white',
-    fontWeight: '700',
-  },
-  locationContainer: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
-  locationText: {
-    ...theme.typography.caption,
-    color: 'rgba(255,255,255,0.7)',
-    marginLeft: 4,
-  },
-  notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+  menuBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
   },
-  notificationBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 12,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: theme.colors.accent,
-    borderWidth: 2,
-    borderColor: '#1a1a1a',
+  logoPill: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: theme.roundness.full,
+  },
+  logoText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  bellBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scroll: {
+    flex: 1,
   },
   scrollContent: {
-    paddingBottom: 120,
+    padding: 16,
+    gap: 14,
   },
-  stickyHeader: {
-    backgroundColor: theme.colors.background,
-    paddingHorizontal: theme.spacing.l,
-    paddingTop: theme.spacing.m,
-    paddingBottom: theme.spacing.s,
+  greetingRow: {
+    gap: 3,
+  },
+  greeting: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  locationText: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingHorizontal: theme.spacing.m,
-    height: 52,
-    borderRadius: theme.roundness.large,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-  searchText: {
-    color: theme.colors.textSecondary,
-    marginLeft: theme.spacing.s,
-    ...theme.typography.body,
-    fontSize: 14,
-  },
-  sectionContainer: {
-    paddingHorizontal: theme.spacing.l,
-    marginBottom: theme.spacing.xl,
-  },
-  badgeContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.l,
-    gap: theme.spacing.s,
-    marginTop: theme.spacing.s,
-    marginBottom: theme.spacing.xl,
-  },
-  reportsList: {
-    marginTop: theme.spacing.s,
-    gap: theme.spacing.m,
-  },
-  categoriesScroll: {
-    marginTop: theme.spacing.s,
-    marginHorizontal: -theme.spacing.l,
-  },
-  categoriesContent: {
-    paddingHorizontal: theme.spacing.l,
-    gap: theme.spacing.s,
-  },
-  categoryChip: {
     backgroundColor: theme.colors.surface,
-    paddingHorizontal: theme.spacing.l,
-    paddingVertical: theme.spacing.s,
-    borderRadius: theme.roundness.medium,
+    borderRadius: theme.roundness.large,
+    padding: 14,
+    gap: 10,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-  categoryChipText: {
-    color: theme.colors.text,
-    ...theme.typography.caption,
-    fontWeight: '600',
+  searchText: {
+    color: theme.colors.textSecondary,
+    fontSize: 14,
   },
-  impactCard: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.roundness.large,
-    padding: theme.spacing.l,
+  grid: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: theme.spacing.l,
-    marginTop: theme.spacing.m,
-    overflow: 'hidden',
+    flexWrap: 'wrap',
+    gap: 10,
   },
-  impactContent: {
-    flex: 1,
-    zIndex: 1,
-  },
-  impactHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  impactTitle: {
-    ...theme.typography.h3,
-    color: 'white',
-    fontWeight: '700',
-  },
-  impactSubtitle: {
-    ...theme.typography.caption,
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: theme.spacing.m,
-  },
-  impactButton: {
-    backgroundColor: 'white',
-    paddingHorizontal: theme.spacing.l,
-    paddingVertical: 10,
-    borderRadius: theme.roundness.medium,
-    alignSelf: 'flex-start',
-  },
-  impactButtonText: {
-    color: theme.colors.primary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  impactIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: -20,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 10,
+  gridCell: {
+    width: '31%',
   },
 });
 

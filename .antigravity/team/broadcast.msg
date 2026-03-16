@@ -9,3 +9,6 @@ BOOSTER TEAM: Hardening iteracion 2 aplicado. Identity usa access token 15m + re
 [2026-03-14T16:49:00.454947Z] BOOSTER ITERATION START: Plan maestro de ejecucion total y arranque paralelo Booster
 [2026-03-14T16:51:29.423982Z] BOOSTER TEAM: Plan maestro 24 semanas actualizado en PLAN.md. Arranque inmediato en paralelo: Backend(task-003, task-004), Frontend(task-005), Reviewer(task-007). CI pipeline creado en .github/workflows/ci.yml.
 [2026-03-15T07:59:18Z] BOOSTER TEAM: Sincronizacion de backend completada. shared/db y shared/auth estandarizados. Servicios backoffice actualizados para usar los mismos contratos de persistencia y auth y sincronizados con docker-compose.
+[2026-03-15T22:00:00Z] BOOSTER ITERATION START v3.0 — Super-app rediseño completo (57 pantallas Stitch analizadas).
+[2026-03-15T22:00:00Z] DECISIONES: Pagos 100% digital via Culqi (escrow), geolocalizacion por red, Servicios unificado (Restaurantes+Tiendas+Mandados=categorias), Super Admin (SUPER_ADMIN), web app dual (admin+cliente). Autorización total del owner.
+[2026-03-15T22:00:00Z] FASE 0 ACTIVA: fix shared/auth bug, design tokens #0f49bd/Public Sans, roles DRIVER/OPERATOR/SUPER_ADMIN, microservicio wallet escrow, gateway actualizado.

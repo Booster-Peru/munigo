@@ -11,6 +11,13 @@ services:
       - REPORTS_URL=http://reports:4002
       - GEO_URL=http://geo:4003
       - NOTIFICATIONS_URL=http://notifications:4004
+      - WALLET_URL=http://wallet:4006
+      - TRANSPORT_URL=http://transport:4005
+      - CATALOG_URL=http://catalog:4007
+      - ORDERS_URL=http://orders:4008
+      - MANDADOS_URL=http://mandados:4009
+      - PETS_URL=http://pets:4010
+      - SOS_URL=http://sos:4011
     ports:
       - '8080:8080'
     depends_on:
@@ -18,6 +25,13 @@ services:
       - reports
       - geo
       - notifications
+      - wallet
+      - transport
+      - catalog
+      - orders
+      - mandados
+      - pets
+      - sos
 
   identity:
     image: node:20-alpine
@@ -76,6 +90,112 @@ services:
     depends_on:
       - redis
       - nats
+
+  wallet:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/wallet/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - WALLET_PORT=4006
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+      - PLATFORM_FEE_PERCENT=${PLATFORM_FEE_PERCENT:-10}
+    ports:
+      - '4006:4006'
+    depends_on:
+      - postgres
+
+  transport:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: sh -c "npm install ws && node services/transport/server.js"
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - TRANSPORT_PORT=4005
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+    ports:
+      - '4005:4005'
+    depends_on:
+      - postgres
+
+  catalog:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/catalog/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - CATALOG_PORT=4007
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+    ports:
+      - '4007:4007'
+    depends_on:
+      - postgres
+
+  orders:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/orders/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - ORDERS_PORT=4008
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+    ports:
+      - '4008:4008'
+    depends_on:
+      - postgres
+
+  mandados:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/mandados/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - MANDADOS_PORT=4009
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+    ports:
+      - '4009:4009'
+    depends_on:
+      - postgres
+
+  pets:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/pets/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - PETS_PORT=4010
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+    ports:
+      - '4010:4010'
+    depends_on:
+      - postgres
+
+  sos:
+    image: node:20-alpine
+    working_dir: /app/backend
+    command: node services/sos/server.js
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - SOS_PORT=4011
+      - DATABASE_URL=${DATABASE_URL:-postgresql://munigo:munigo@postgres:5432/munigo}
+      - JWT_SECRET=${JWT_SECRET:-change_this_secret}
+    ports:
+      - '4011:4011'
+    depends_on:
+      - postgres
 
   postgres:
     image: postgis/postgis:16-3.4

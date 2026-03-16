@@ -1,231 +1,223 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
-import { theme } from '../config/theme';
 import {
-  Settings,
-  Edit2,
-  LogOut,
-  ChevronRight,
-  Bell,
-  Shield,
-  HelpCircle,
-} from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types/navigation';
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../hooks/useAuth';
+import { theme } from '../config/theme';
 
-const ProfileScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { logout } = useAuth();
+const ACTIVITY_ITEMS = [
+  { icon: 'bicycle-outline', label: 'Historial de viajes', iconBg: '#eff6ff', iconColor: '#2563eb' },
+  { icon: 'bag-handle-outline', label: 'Mis pedidos', iconBg: '#fff7ed', iconColor: '#f97316' },
+  { icon: 'paw-outline', label: 'Mis adopciones', iconBg: '#f0fdf4', iconColor: '#059669' },
+  { icon: 'help-circle-outline', label: 'Soporte y Ayuda', iconBg: '#fefce8', iconColor: '#ca8a04' },
+];
 
-  const menuItems = [
-    { icon: Bell, title: 'Notificaciones', color: '#3B82F6' },
-    { icon: Shield, title: 'Seguridad y Privacidad', color: '#10B981' },
-    { icon: HelpCircle, title: 'Ayuda y Soporte', color: '#F59E0B' },
-  ];
+export default function ProfileScreen() {
+  const { user, logout } = useAuth();
+  const initials = user?.fullName
+    ?.split(' ')
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase() || 'US';
+
+  const handleLogout = () => {
+    Alert.alert('Cerrar sesión', '¿Deseas cerrar sesión?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Cerrar sesión', style: 'destructive', onPress: logout },
+    ]);
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Mi Cuenta</Text>
-        <TouchableOpacity style={styles.iconButton}>
-          <Settings size={20} color={theme.colors.text} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarPlaceholder}>JD</Text>
-            </View>
-            <TouchableOpacity style={styles.editBadge}>
-              <Edit2 size={12} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.userName}>Juan De la Cruz</Text>
-          <Text style={styles.userEmail}>juan.cruz@gmail.com</Text>
-          <TouchableOpacity style={styles.completeProfileButton}>
-            <Text style={styles.completeProfileText}>Perfil verificado</Text>
+        <View style={styles.logoPill}>
+          <Text style={styles.logoText}>MuniGo</Text>
+        </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.headerBtn}>
+            <Ionicons name="notifications-outline" size={22} color={theme.colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerBtn}>
+            <Ionicons name="create-outline" size={22} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
+      </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferencias</Text>
-          {menuItems.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.menuItem}>
-              <View style={[styles.menuIconContainer, { backgroundColor: item.color + '10' }]}>
-                <item.icon size={20} color={item.color} />
-              </View>
-              <Text style={styles.menuItemText}>{item.title}</Text>
-              <ChevronRight size={20} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
-          ))}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Profile card */}
+        <View style={styles.profileCard}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initials}</Text>
+          </View>
+          <Text style={styles.userName}>{user?.fullName || 'Usuario MuniGo'}</Text>
+          <Text style={styles.userContact}>{user?.email || 'usuario@munigo.pe'}</Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={async () => {
-            await logout();
-            navigation.navigate('Welcome');
-          }}
-        >
-          <LogOut size={20} color={theme.colors.error} />
-          <Text style={styles.logoutText}>Cerrar Sesión</Text>
-        </TouchableOpacity>
+        <View style={styles.content}>
+          {/* Método de pago */}
+          <Text style={styles.sectionTitle}>Método de pago</Text>
+          <TouchableOpacity style={styles.paymentRow} activeOpacity={0.8}>
+            <View style={styles.visaBadge}>
+              <Text style={styles.visaText}>VISA</Text>
+            </View>
+            <View style={styles.paymentInfo}>
+              <Text style={styles.paymentTitle}>Visa **** 1234</Text>
+              <Text style={styles.paymentSub}>Expira en 09/26</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
 
-        <Text style={styles.versionText}>MuniGo v1.0.0</Text>
+          {/* Mi Actividad */}
+          <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Mi Actividad</Text>
+          {ACTIVITY_ITEMS.map((item) => (
+            <TouchableOpacity key={item.label} style={styles.activityRow} activeOpacity={0.8}>
+              <View style={[styles.activityIcon, { backgroundColor: item.iconBg }]}>
+                <Ionicons name={item.icon as any} size={20} color={item.iconColor} />
+              </View>
+              <Text style={styles.activityLabel}>{item.label}</Text>
+              <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+          ))}
+
+          {/* Términos */}
+          <TouchableOpacity style={styles.termsRow}>
+            <Text style={styles.termsText}>Términos y condiciones</Text>
+          </TouchableOpacity>
+
+          {/* Cerrar sesión */}
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.85}>
+            <Ionicons name="log-out-outline" size={20} color="#dc2626" />
+            <Text style={styles.logoutText}>Cerrar sesión</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.versionText}>MuniGo v1.0.0 — Canoas de Punta Sal, Tumbes</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
+  container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: theme.spacing.l,
-  },
-  title: {
-    ...theme.typography.h2,
-    color: theme.colors.text,
-  },
-  iconButton: {
-    padding: theme.spacing.s,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.roundness.medium,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
-  content: {
-    padding: theme.spacing.l,
+  logoPill: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: theme.roundness.full,
   },
+  logoText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  headerActions: { flexDirection: 'row', gap: 4 },
+  headerBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   profileCard: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.primary,
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 4,
     borderRadius: theme.roundness.large,
-    padding: theme.spacing.l,
+    padding: 24,
     alignItems: 'center',
-    marginBottom: theme.spacing.l,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: theme.spacing.m,
+    gap: 6,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
-  },
-  avatarPlaceholder: {
-    ...theme.typography.h1,
-    color: '#FFF',
-    fontSize: 32,
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: theme.colors.text,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
     justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: theme.colors.surface,
+    marginBottom: 4,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  userName: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-  },
-  userEmail: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.m,
-  },
-  completeProfileButton: {
-    backgroundColor: theme.colors.success + '15',
-    paddingHorizontal: theme.spacing.m,
-    paddingVertical: 6,
-    borderRadius: 100,
-  },
-  completeProfileText: {
-    color: theme.colors.success,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  section: {
-    marginBottom: theme.spacing.l,
-  },
+  avatarText: { color: '#fff', fontSize: 26, fontWeight: '700' },
+  userName: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  userContact: { color: 'rgba(255,255,255,0.75)', fontSize: 13 },
+  content: { paddingHorizontal: 16, paddingTop: 20 },
   sectionTitle: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.m,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    fontSize: 13,
     fontWeight: '700',
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 10,
   },
-  menuItem: {
+  paymentRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
     backgroundColor: theme.colors.surface,
-    padding: theme.spacing.m,
     borderRadius: theme.roundness.medium,
-    marginBottom: theme.spacing.s,
+    padding: 14,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-  menuIconContainer: {
+  visaBadge: {
+    backgroundColor: '#1a1f71',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  visaText: { color: '#fff', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  paymentInfo: { flex: 1 },
+  paymentTitle: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
+  paymentSub: { fontSize: 12, color: theme.colors.textSecondary, marginTop: 1 },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  activityIcon: {
     width: 40,
     height: 40,
-    borderRadius: 12,
-    justifyContent: 'center',
+    borderRadius: 10,
     alignItems: 'center',
-    marginRight: theme.spacing.m,
+    justifyContent: 'center',
   },
-  menuItemText: {
-    flex: 1,
-    ...theme.typography.body,
-    fontWeight: '600',
-    color: theme.colors.text,
+  activityLabel: { flex: 1, fontSize: 14, fontWeight: '500', color: theme.colors.text },
+  termsRow: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
-  logoutButton: {
+  termsText: { fontSize: 13, color: theme.colors.textSecondary },
+  logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.error + '10',
-    padding: theme.spacing.m,
+    gap: 8,
+    backgroundColor: '#fee2e2',
     borderRadius: theme.roundness.medium,
-    marginTop: theme.spacing.m,
-    gap: 10,
+    padding: 16,
+    marginTop: 20,
   },
-  logoutText: {
-    ...theme.typography.body,
-    color: theme.colors.error,
-    fontWeight: '600',
-  },
+  logoutText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
   versionText: {
     textAlign: 'center',
-    marginTop: theme.spacing.xl,
+    marginTop: 20,
+    marginBottom: 8,
     color: theme.colors.textSecondary,
-    fontSize: 12,
+    fontSize: 11,
   },
 });
-
-export default ProfileScreen;

@@ -6,6 +6,14 @@ if (typeof global.structuredClone !== 'function') {
   global.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
+// Mock @expo/vector-icons
+jest.mock('@expo/vector-icons', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const MockIcon = (props) => React.createElement(View, { testID: `ionicon-${props.name}` });
+  return { Ionicons: MockIcon };
+});
+
 // Mock lucide-react-native
 jest.mock('lucide-react-native', () => {
   const React = require('react');

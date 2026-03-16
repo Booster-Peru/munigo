@@ -10,7 +10,7 @@
 | Campo                | Valor                                                                 |
 | -------------------- | --------------------------------------------------------------------- |
 | GUID                 | `e9f2ae00-c96e-47ac-b12f-abce0570163a`                                |
-| Version              | `3.0.0`                                                               |
+| Version              | `3.1.0`                                                               |
 | Fecha de creacion    | `2024-05-24`                                                          |
 | Ultima actualizacion | `2026-03-15`                                                          |
 | Owner                | `Antigravity`                                                         |
@@ -45,7 +45,7 @@ El contexto de diseno esta centrado en **Canoas de Punta Sal, Tumbes**, pero la 
 | --------------------- | --------------- | --------------- |
 | App Ciudadano         | Mobile React Native/Expo | In progress (rediseño) |
 | App Driver Partner    | Mobile React Native/Expo | Por construir   |
-| Panel Municipal       | Mobile (mismo repo, perfil rol SUPERVISOR) | Por construir |
+| Super Admin Panel     | Web React SPA (web-admin), rol SUPER_ADMIN | Refactor pendiente |
 | Web Admin             | React SPA       | Refactor pendiente |
 | Backend API           | Microservicios Node.js | In progress     |
 
@@ -70,15 +70,13 @@ El contexto de diseno esta centrado en **Canoas de Punta Sal, Tumbes**, pero la 
 | ------------ | ---------------- | --------------------- | ---------------------- |
 | Home         | 2                | Ciudadano             | Parcial — rediseñar    |
 | Transporte   | 9                | Ciudadano             | No existe              |
-| Restaurantes | 13               | Ciudadano + Operador  | No existe              |
-| Tiendas SIAR | 7                | Ciudadano + Operador  | No existe              |
-| Mandados     | 5                | Ciudadano             | No existe              |
+| Servicios    | 25               | Ciudadano + Operador  | No existe (Restaurantes + Tiendas + Mandados como categorias) |
 | Billetera    | 8                | Ciudadano             | No existe              |
 | Mascotas     | 2                | Ciudadano             | No existe              |
 | SOS          | 1                | Ciudadano             | No existe              |
 | Perfil       | 1                | Ciudadano             | Parcial — ampliar      |
 | Driver App   | 7                | Conductor             | No existe              |
-| Panel Municipal | 1             | Supervisor            | Parcial (web-admin)    |
+| Super Admin     | 1             | SUPER_ADMIN           | Parcial (web-admin)    |
 
 ---
 
@@ -102,10 +100,11 @@ Donde:
 [ Inicio ] [ Pagos ] [ Rutas ] [ Perfil ]
 ```
 
-### 5.3 Bottom Navigation — Panel Municipal
+### 5.3 Web Admin — Super Admin Panel
 
 ```
-[ Panel ] [ Conductores ] [ Viajes ] [ Ajustes ]
+Acceso web: /web-admin — autenticacion con rol SUPER_ADMIN
+Secciones: Panel | Conductores | Viajes | Transacciones | Ajustes
 ```
 
 ---
@@ -162,7 +161,7 @@ Confirmacion → Tracking en vivo → Resumen final → Calificacion
 - Mapa con origen y destino
 - Opcion Standard: S/ 5.00, "Economico • 3 min de espera"
 - Opcion Premium: S/ 8.00, "Extra espacio • 5 min de espera"
-- Metodo de pago: Efectivo o Billetera MuniGo
+- Metodo de pago: Billetera MuniGo (UNICO — sin efectivo, plataforma escrow)
 - Campo de cupon de descuento
 - CTA: "Solicitar Mototaxi"
 
@@ -428,9 +427,9 @@ Tracking → Completado + Calificacion
 
 ---
 
-### 6.11 Panel Municipal (Supervisor)
+### 6.11 Super Admin Panel
 
-**Pantalla Stitch:** `Panel Municipal Control MuniGo` (465531281) — pantalla MOBILE
+**Pantalla Stitch:** `Panel Municipal Control MuniGo` (465531281) — web-admin React SPA
 
 **Elementos UI:**
 - Metricas en cards:
@@ -449,7 +448,7 @@ Tracking → Completado + Calificacion
 - FR-MUN-003: Estado en tiempo real de subsistemas (transporte, pagos, notificaciones)
 - FR-MUN-004: Gestion de conductores: listar, ver detalle, suspender, reactivar
 - FR-MUN-005: Historial de viajes con filtros por fecha, conductor y estado
-- FR-MUN-006: Panel accesible via mobile (mismo repo Expo, rol SUPERVISOR)
+- FR-MUN-006: Panel accesible via web-admin (React SPA), rol SUPER_ADMIN requerido
 
 **Gap vs codigo actual:** web-admin actual tiene gestion basica de reportes. Requiere refactor completo + expansion a transporte y conductores.
 
@@ -544,8 +543,35 @@ DriverApp (BottomTabs: Inicio | Pagos | Rutas | Perfil)
 | CITIZEN    | Ciudadano general — consume todos los servicios |
 | DRIVER     | Conductor partner — provee transporte           |
 | OPERATOR   | Operador de restaurante o tienda local          |
-| SUPERVISOR | Supervisor municipal — panel de control         |
-| ADMIN      | Administrador del sistema                       |
+| SUPER_ADMIN | Administrador total del sistema — acceso web-admin completo |
+
+### 7.5 Modelo de pagos y anti-fraude
+
+**Regla fundamental:** TODOS los pagos son digitales. No existe opcion de efectivo en ninguna pantalla.
+
+**PSP:** Culqi (Peru) — unico gateway de tarjetas de credito/debito.
+
+**Modelo Escrow:**
+```
+Ciudadano paga (debita billetera)
+       ↓
+Plataforma retiene en ESCROW
+       ↓
+Servicio completado y confirmado
+       ↓
+Plataforma libera al partner (monto - comision)
+```
+
+**Regla anti-fraude:** NUNCA hay transferencia directa cliente ↔ partner. Todo flujo de dinero pasa por el microservicio wallet con audit trail inmutable (tabla `wallet_transactions` es APPEND ONLY — nunca se borra).
+
+**Comision plataforma:** 10% por defecto (configurable via `PLATFORM_FEE_PERCENT`).
+
+**Tablas wallet:**
+- `wallets(user_id, balance, currency)` — saldo por usuario
+- `wallet_transactions(id, user_id, type, amount, balance_after, ...)` — audit trail
+- `escrow_holds(id, payer_id, beneficiary_id, amount, platform_fee, net_amount, status)` — retenciones
+
+**Estados escrow:** `HELD` → `RELEASED` (servicio completado) | `REFUNDED` (cancelacion)
 
 ---
 
@@ -572,7 +598,7 @@ DriverApp (BottomTabs: Inicio | Pagos | Rutas | Perfil)
 
 1. **reports/server.js** require `shared/auth` que no existe — usar `shared/jwt`
 2. **theme.ts** color primario es `#135bec` — actualizar a `#0f49bd` segun Stitch
-3. **web-admin** no tiene auth por roles — agregar autorizacion SUPERVISOR
+3. **web-admin** no tiene auth por roles — agregar autorizacion SUPER_ADMIN
 
 ---
 
@@ -611,7 +637,7 @@ Scenario: Conductor activa su disponibilidad
   And empieza a recibir solicitudes de viaje cercanas
 
 Scenario: Supervisor revisa actividad del dia
-  Given el supervisor tiene rol SUPERVISOR
+  Given el supervisor tiene rol SUPER_ADMIN
   When abre el Panel Municipal
   Then ve en tiempo real: conductores activos, viajes del dia, transacciones
   And puede ver el mapa con posiciones de conductores activos
@@ -704,5 +730,499 @@ Scenario: Supervisor revisa actividad del dia
 
 ---
 
-*specs.md v3.0.0 — Actualizado el 2026-03-15 por Claude Opus 4.6*
-*Basado en analisis de 57 pantallas del proyecto Stitch `9904501399194749579` (MuniGO)*
+---
+
+## 13. Modelo de negocio y monetizacion
+
+> Esta seccion es FUENTE DE VERDAD para cualquier agente que construya logica de comisiones, onboarding de partners o configuracion de tarifas.
+
+### 13.0 Estrategia go-to-market — modelo hibrido (DECISION CONFIRMADA)
+
+MuniGo no vende exclusivamente a municipios ni opera exclusivamente directo. El modelo es **hibrido**:
+
+```
+NIVEL 1 — Municipalidad (cliente institucional):
+  - Paga licencia anual por territorio exclusivo (~S/ 3,600-18,000/año segun tier)
+  - Recibe app con su branding: "MuniGo Canoas de Punta Sal"
+  - INCENTIVO: Recibe X% de las comisiones generadas en su territorio
+  - SU ROL: Promover la app a ciudadanos, mototaxistas y comercios locales
+  - Ciclo de venta: directo con alcalde / gerente municipal
+
+NIVEL 2 — Partners (conductores, comercios, mandaderos):
+  - Se registran en la plataforma (onboarding digital)
+  - Pagan suscripcion mensual (comercios) o no pagan nada por registro (conductores)
+  - MuniGo toma comision de cada transaccion completada
+
+NIVEL 3 — Ciudadanos:
+  - Uso gratuito de la app
+  - Solo pagan los servicios que consumen via Billetera MuniGo
+
+RESULTADO: La Municipalidad tiene incentivo economico para promover —
+a mas viajes y pedidos en su territorio, mas ingresos recibe.
+```
+
+**Tiers de licencia municipal:**
+
+| Tier       | Conductores | Comercios | Ciudadanos | Precio anual | % comision municipio |
+|------------|-------------|-----------|------------|--------------|----------------------|
+| Basico     | hasta 30    | hasta 10  | ilimitado  | S/ 3,600     | 2% de comisiones     |
+| Pro        | hasta 150   | hasta 50  | ilimitado  | S/ 10,800    | 3% de comisiones     |
+| Enterprise | ilimitado   | ilimitado | ilimitado  | S/ 18,000+   | 5% de comisiones     |
+
+### 13.1 Flujos de ingreso de la plataforma
+
+MuniGo opera como intermediario entre ciudadanos y tres tipos de partners: **conductores**, **comercios** (restaurantes y tiendas) y **mandaderos**.
+
+```
+RESUMEN DE INGRESOS:
+  1. Licencia anual por municipio (SaaS territorial)
+  2. Comision por viaje (transporte mototaxi)
+  3. Comision por orden (food delivery + tiendas + mandados)
+  4. Suscripcion mensual de comercios (restaurantes y tiendas)
+```
+
+### 13.2 Estructura de comisiones por modulo
+
+#### Transporte (Mototaxi)
+
+| Concepto             | Valor        | Configurable         |
+|----------------------|--------------|----------------------|
+| Tarifa standard      | S/ 5.00      | Si — tabla `fares`   |
+| Tarifa premium       | S/ 8.00      | Si — tabla `fares`   |
+| Comision plataforma  | 15%          | Si — `platform_config` |
+| Conductor recibe     | 85%          | Derivado automaticamente |
+| Metodo de pago       | Solo Billetera MuniGo | No hay efectivo |
+
+**Flujo del dinero:**
+```
+Ciudadano paga S/ 5.00 (debita billetera)
+       ↓
+Escrow retiene S/ 5.00
+       ↓
+Viaje completado y confirmado
+       ↓
+Plataforma retiene S/ 0.75 (15%)
+Conductor recibe S/ 4.25 (85%) — liberado del escrow
+```
+
+#### Food Delivery (Restaurantes)
+
+| Concepto                 | Valor         | Configurable          |
+|--------------------------|---------------|-----------------------|
+| Suscripcion mensual      | S/ 150/mes    | Si — por segmento     |
+| Comision por orden       | 12% del subtotal | Si — `platform_config` |
+| Delivery fee al ciudadano| S/ 3.00       | Si — por tienda       |
+| Delivery fee va a        | Repartidor (100%) | No |
+| Restaurante recibe       | Subtotal - 12% | Derivado              |
+
+**Ejemplo:**
+```
+Orden: 2x Ceviche (S/ 18) + envío S/ 3 = ciudadano paga S/ 21
+MuniGo cobra: 12% de S/ 18 = S/ 2.16
+Repartidor recibe: S/ 3.00
+Restaurante recibe: S/ 15.84
+```
+
+#### Tiendas / SIAR Marketplace
+
+Mismo modelo que restaurantes. `source_type: STORE` en el microservicio orders.
+
+#### Mandados (Te hago un favor)
+
+| Concepto             | Valor       | Configurable          |
+|----------------------|-------------|-----------------------|
+| Tarifa COMPRAS       | S/ 8.00     | Si — tabla `fares`    |
+| Tarifa TRAMITE       | S/ 10.00    | Si — tabla `fares`    |
+| Tarifa MENSAJERIA    | S/ 6.00     | Si — tabla `fares`    |
+| Tarifa OTRO          | S/ 8.00     | Si — tabla `fares`    |
+| Comision plataforma  | 20%         | Si — `platform_config` |
+| Mandadero recibe     | 80%         | Derivado              |
+
+#### Licencia por municipio
+
+Ver tabla en seccion 13.0. El precio incluye branding personalizado y % de comisiones del territorio.
+
+### 13.2b Modelo de formalizacion de mototaxistas — SUNAT (DECISION CONFIRMADA)
+
+Este es el diferenciador estrategico mas importante de MuniGo frente a cualquier competidor informal.
+
+**El problema que resuelve:**
+- Los mototaxistas en Peru operan en informalidad total
+- SUNAT pierde recaudacion de impuestos sobre el movimiento de dinero del sector
+- Los mototaxistas no tienen acceso a credito formal, seguro de salud ni jubilacion
+
+**El modelo MuniGo:**
+```
+1. Mototaxista se registra en MuniGo como "conductor partner"
+2. MuniGo actua como OPERADOR FORMAL ante SUNAT
+3. Cada viaje genera un COMPROBANTE ELECTRONICO SUNAT (boleta electronica)
+   emitido por MuniGo (con su RUC)
+4. MuniGo retiene y paga:
+   - IGV (18%) sobre los servicios de la plataforma (la comision de MuniGo)
+   - Renta de cuarta categoria del conductor (si aplica segun monto)
+5. El conductor recibe recibo por honorarios electronico o planilla
+6. La Municipalidad puede reportar a SUNAT la formalizacion del sector
+```
+
+**IMPORTANTE — Entidad reguladora:**
+> La entidad recaudadora de impuestos en Peru es **SUNAT**
+> (Superintendencia Nacional de Aduanas y de Administracion Tributaria).
+> Nunca referirse como "ZUNAT" en documentacion o comunicaciones.
+
+**Implicaciones tecnicas:**
+- MuniGo necesita integracion con la **API de Facturacion Electronica de SUNAT** (OSE/PSE)
+- Cada `trip` completado genera un comprobante electronico con:
+  - RUC de MuniGo como emisor
+  - DNI del ciudadano como receptor (opcional — puede ser boleta sin cliente)
+  - Detalle: "Servicio de transporte en mototaxi"
+  - Monto, IGV, fecha
+- Los conductores deben tener DNI verificado en el sistema
+- MuniGo debe inscribirse en SUNAT con el regimen tributario apropiado
+
+**Marco legal aplicable:**
+- Ley N° 27181 — Ley General de Transporte y Transito Terrestre
+- Decreto Supremo N° 017-2009-MTC — Reglamento Nacional de Administracion de Transporte
+- Reglamentos municipales de mototaxis (cada municipio regula localmente)
+- Resolucion de Superintendencia N° 097-2012/SUNAT (comprobantes electronicos)
+- Marco de plataformas digitales de transporte (en evolucion en Peru, verificar vigencia)
+
+> **CRITICO:** Antes de lanzar en cualquier municipio, validar con un abogado especializado
+> en transporte y tributario peruano que el modelo cumple con la normativa vigente.
+
+---
+
+### 13.2c Calculo de tarifa de mototaxi
+
+Las mototaxis en Peru tienen tradicion de tarifa fija por zona, no por km como Uber.
+El modelo recomendado combina ambos enfoques para ser justo y configurable.
+
+**Modelo de calculo (a implementar):**
+
+```
+OPCION A — Zonas (MVP, recomendado para lanzamiento):
+  El Super Admin define zonas geograficas (poligonos)
+  Cada par de zonas tiene una tarifa:
+    Zona Centro → Zona Centro: S/ 5.00
+    Zona Centro → Zona Playa: S/ 8.00
+    Zona Centro → Fuera del Distrito: S/ 12.00
+  El ciudadano ve el precio exacto antes de confirmar
+
+OPCION B — Distancia + base (para expansion):
+  Tarifa base: S/ 3.00 (primeros 500m incluidos)
+  + S/ 0.80 por km adicional
+  Minimo cobro: S/ 5.00
+  Nocturno (10pm - 5am): +20% recargo
+  El sistema calcula con coordenadas GPS del origen y destino estimado
+
+OPCION C — Tiempo + distancia (como Uber — para mercados mas grandes):
+  No recomendado para MVP en zonas rurales/semiurbanas peruanas
+  Las conexiones GPS pueden ser inestables
+```
+
+**Implementacion recomendada:**
+- En `platform_config` se define el modelo activo (`fare_model: ZONES | DISTANCE | HYBRID`)
+- Para modelo ZONES: tabla `fare_zones(id, municipality_id, name, polygon GEOMETRY, color)`
+  y tabla `zone_fares(from_zone_id, to_zone_id, fare, night_fare)`
+- El endpoint `/v1/transport/estimate` recibe origen+destino y devuelve tarifa estimada
+- La tarifa estimada se muestra en BookingScreen ANTES de confirmar
+
+**DB necesaria (no implementada):**
+```sql
+fare_zones(
+  id UUID PRIMARY KEY,
+  municipality_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  polygon GEOMETRY(POLYGON, 4326),  -- requiere PostGIS
+  created_at TIMESTAMPTZ DEFAULT now()
+)
+
+zone_fares(
+  from_zone_id UUID REFERENCES fare_zones(id),
+  to_zone_id   UUID REFERENCES fare_zones(id),
+  fare         NUMERIC(8,2) NOT NULL,
+  night_fare   NUMERIC(8,2),
+  PRIMARY KEY (from_zone_id, to_zone_id)
+)
+```
+
+---
+
+### 13.3 Onboarding de partners (flujo de registro de comercios)
+
+Hoy este flujo NO EXISTE en el codigo. Es un gap critico para Fase 5.
+
+**Flujo esperado:**
+```
+1. Operador descarga app o va a web-admin
+2. Selecciona "Registrar mi negocio"
+3. Completa formulario:
+   - Nombre del negocio
+   - Tipo (RESTAURANTE | TIENDA | OTRO)
+   - RUC (numero de identificacion fiscal peruano)
+   - Direccion y coordenadas GPS
+   - Horario de atencion
+   - Foto del local / logo
+4. Sube documentos: RUC, licencia municipal de funcionamiento
+5. Elige plan de suscripcion
+6. SUPER_ADMIN revisa y aprueba (flujo de moderacion)
+7. Al aprobar: se crea entry en `restaurants` o `stores`, se activa cuenta OPERATOR
+8. Operador puede empezar a cargar su catalogo
+```
+
+**Entidades de DB necesarias (no implementadas):**
+```sql
+partner_applications(
+  id, applicant_id, business_name, type, ruc,
+  address, lat, lng, schedule, logo_url,
+  documents JSONB, status [PENDING|APPROVED|REJECTED],
+  reviewed_by, reviewed_at, created_at
+)
+
+partner_subscriptions(
+  id, partner_id, tier, monthly_fee,
+  billing_cycle_start, billing_cycle_end,
+  status [ACTIVE|PAST_DUE|CANCELLED], created_at
+)
+```
+
+### 13.4 Gestion de catalogo por el operador
+
+Hoy el catalogo esta hardcodeado como seed en `catalog/server.js`. En produccion, los operadores deben poder gestionar su catalogo desde la app o panel web.
+
+**Funcionalidades del panel de operador (Fase 5-6):**
+
+1. **Agregar producto manual:**
+   - Nombre, precio, categoria, descripcion
+   - Foto: desde camara del telefono O desde URL externa
+
+2. **Busqueda de imagen en internet:**
+   - El operador escribe el nombre del producto
+   - El sistema llama a Google Custom Search Image API (o similar)
+   - Se muestran 6-8 opciones de imagen para elegir
+   - El operador selecciona una, la plataforma la descarga y la almacena en S3/Cloudinary
+   - NOTA: La implementacion del buscador de imagenes es opcional en MVP; en MVP el operador puede subir foto desde camara
+
+3. **Editar precios en masa:**
+   - Lista de todos los productos con precio editable inline
+   - CTA "Guardar cambios" al final
+
+4. **Activar/desactivar productos:**
+   - Toggle de disponibilidad por producto (sin eliminarlo)
+
+5. **Ver estadisticas basicas:**
+   - Productos mas pedidos
+   - Ingreso del dia/semana/mes
+   - Pedidos pendientes (ya implementado en RestaurantPanelScreen)
+
+**Endpoints necesarios en catalog service (no implementados):**
+```
+POST   /v1/catalog/restaurants/:id/menu     — agregar item al menu
+PATCH  /v1/catalog/menu/:itemId             — actualizar item
+DELETE /v1/catalog/menu/:itemId             — eliminar item
+POST   /v1/catalog/stores/:id/products      — agregar producto
+PATCH  /v1/catalog/products/:id             — actualizar producto
+DELETE /v1/catalog/products/:id             — eliminar producto
+GET    /v1/catalog/image-search?q=          — buscar imagen (proxy a Google)
+```
+
+### 13.4b Modelo de expansion geografica — UNA sola app para todo el Peru (DECISION CONFIRMADA)
+
+**Decision clave:** MuniGo es UNA SOLA aplicacion con UN SOLO brand para todo el Peru.
+NO se crean instancias separadas por municipio. NO hay "MuniGo Piura" ni "MuniGo Cancas" como apps distintas.
+
+**Modelo correcto — analogia Uber/Rappi:**
+```
+El ciudadano descarga "MuniGo" desde App Store o Play Store
+→ La app detecta su ubicacion GPS
+→ Muestra los mototaxistas, restaurantes, tiendas y mandaderos
+  disponibles CERCA DE EL en este momento
+→ Si no hay servicios en su zona: "Proximamente en tu ciudad"
+→ Mismo UX en Lima, Piura, Tumbes o cualquier distrito del Peru
+```
+
+**Rol del municipio en este modelo:**
+- El municipio NO tiene una app propia ni un subdominio propio
+- El municipio ES UN SOCIO que promueve MuniGo a sus ciudadanos
+- A cambio, recibe un % de las comisiones generadas en su territorio (identificado por GPS)
+- El municipio puede ver un reporte de actividad en su zona desde el Super Admin Panel
+- No hay personalización de branding por municipio en la app del ciudadano
+
+**Como funciona el municipality_id en la arquitectura:**
+```
+municipality_id NO es un separador de tenants.
+municipality_id es METADATA GEOGRAFICA que se asigna automaticamente
+basado en las coordenadas GPS de la transaccion.
+
+Ejemplos de uso:
+  trip.municipality_id = 'cancas-punta-sal'   ← asignado por donde ocurrio el viaje
+  order.municipality_id = 'cancas-punta-sal'  ← asignado por ubicacion del restaurante
+
+Esto sirve para:
+  - Calcular el % de comision que le corresponde al municipio socio
+  - Generar reportes de actividad por zona para el Super Admin
+  - Reportar formalizacion a SUNAT por zona geografica
+
+NO sirve para:
+  - Filtrar datos entre usuarios (un ciudadano de Lima puede pedir en Piura si viaja)
+  - Separar instancias de la app
+  - Cambiar el branding o la experiencia del usuario
+```
+
+**DB: tabla municipalities (solo para reportes y acuerdos comerciales):**
+```sql
+municipalities(
+  id          TEXT PRIMARY KEY,      -- 'cancas-punta-sal'
+  name        TEXT NOT NULL,          -- 'Canoas de Punta Sal'
+  region      TEXT,                   -- 'Tumbes'
+  polygon     GEOMETRY(POLYGON,4326), -- limites geograficos del distrito
+  commission_pct NUMERIC(4,2),        -- % de comisiones que recibe
+  contract_status TEXT,               -- ACTIVE | PROSPECT | INACTIVE
+  contact_name TEXT,
+  contact_email TEXT,
+  activated_at TIMESTAMPTZ
+)
+```
+
+**Como MuniGo determina a que municipio pertenece una transaccion:**
+```
+ST_Within(punto_gps, municipalities.polygon)
+→ Si el punto cae dentro del poligono del municipio, se le asigna ese municipality_id
+→ Si no cae en ningun municipio registrado: municipality_id = 'unassigned'
+   (zona sin acuerdo comercial — MuniGo opera igual, solo no hay % para municipio)
+```
+
+**Expansion a nuevas ciudades:**
+```
+1. Municipio firma acuerdo comercial → se inserta en tabla municipalities
+2. MuniGo habilita su poligono geografico
+3. Conductores y comercios de esa zona pueden registrarse
+4. Los ciudadanos ya ven servicios disponibles cerca de ellos automaticamente
+5. No hay deploy nuevo, no hay nueva app, no hay configuracion especial
+```
+
+---
+
+### 13.5 Configuracion de tarifas y comisiones (Super Admin)
+
+Hoy las tarifas y comisiones estan hardcodeadas en:
+- `transport/server.js`: `FARES = { standard: 5, premium: 8 }`
+- `mandados/server.js`: `FARES = { COMPRAS: 8, TRAMITE: 10, ... }`
+- `wallet/server.js`: `PLATFORM_FEE_PERCENT` (env var)
+- `orders/server.js`: `DELIVERY_FEE = 3.00` (constante)
+
+**Objetivo:** Todo lo anterior debe vivir en una tabla `platform_config` y ser editable desde el Super Admin Panel sin necesidad de redeploy.
+
+**Tabla necesaria:**
+```sql
+platform_config(
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  label TEXT,          -- descripcion legible
+  type  TEXT,          -- NUMBER | PERCENT | BOOLEAN | TEXT
+  module TEXT,         -- TRANSPORT | FOOD | MANDADOS | PLATFORM
+  updated_by TEXT,
+  updated_at TIMESTAMPTZ DEFAULT now()
+)
+
+-- Seed inicial:
+INSERT INTO platform_config VALUES
+  ('transport_fare_standard', '5.00', 'Tarifa standard mototaxi', 'NUMBER', 'TRANSPORT', ...),
+  ('transport_fare_premium',  '8.00', 'Tarifa premium mototaxi',  'NUMBER', 'TRANSPORT', ...),
+  ('transport_commission_pct','15',   'Comision transporte (%)',   'PERCENT','TRANSPORT', ...),
+  ('food_commission_pct',     '12',   'Comision restaurantes (%)', 'PERCENT','FOOD',      ...),
+  ('shop_commission_pct',     '12',   'Comision tiendas (%)',      'PERCENT','FOOD',      ...),
+  ('mandados_commission_pct', '20',   'Comision mandados (%)',     'PERCENT','MANDADOS',  ...),
+  ('delivery_fee_fixed',      '3.00', 'Costo fijo de delivery',    'NUMBER', 'PLATFORM',  ...),
+  ('mandados_fare_compras',   '8.00', 'Tarifa mandado compras',    'NUMBER', 'MANDADOS',  ...),
+  ('mandados_fare_tramite',  '10.00', 'Tarifa mandado tramite',    'NUMBER', 'MANDADOS',  ...),
+  ('mandados_fare_mensajeria','6.00', 'Tarifa mandado mensajeria', 'NUMBER', 'MANDADOS',  ...);
+```
+
+**Endpoints necesarios (nuevo microservicio `config` o en gateway):**
+```
+GET    /v1/admin/config          — listar toda la configuracion (SUPER_ADMIN)
+PATCH  /v1/admin/config/:key     — actualizar un valor (SUPER_ADMIN)
+GET    /v1/config/public         — configuracion publica (fares para mostrar al ciudadano)
+```
+
+### 13.6 Retiro de ganancias por partners y conductores
+
+El ciclo de pago hacia conductores y operadores no esta implementado.
+
+**Flujo esperado:**
+```
+1. Escrow libera monto neto al balance del partner en `wallets`
+   (ya implementado en wallet/server.js: POST /v1/wallet/escrow/release)
+
+2. Partner ve su saldo en panel y solicita retiro:
+   - Ingresa numero de cuenta bancaria o CCI
+   - Solicita retiro de X soles
+
+3. Se crea registro en `withdrawal_requests`:
+   withdrawal_requests(id, user_id, amount, account_number, cci,
+                       bank, status [PENDING|PROCESSING|COMPLETED|FAILED],
+                       processed_at, external_tx_id)
+
+4. SUPER_ADMIN procesa manualmente o via batch diario:
+   - Transfiere via banca electronica (Interbank, BCP, etc.)
+   - Actualiza estado a COMPLETED con ID de transferencia
+
+5. Partner recibe notificacion push: "Tu retiro de S/ X.XX fue procesado"
+```
+
+> En MVP (Fase 5): el proceso de retiro es MANUAL — el SUPER_ADMIN lo hace desde el panel.
+> En produccion real: integracion con API bancaria para transferencias automaticas.
+
+---
+
+## 14. Estado del codigo a 2026-03-16
+
+### 14.1 Microservicios — estado real
+
+| Servicio     | Puerto | Estado real     | Notas                                        |
+|--------------|--------|-----------------|----------------------------------------------|
+| gateway      | 8080   | ✅ Funcional    | Rutas: identity, reports, geo, notifications, wallet, transport, catalog, orders |
+| identity     | 4001   | ✅ Funcional    | Roles: CITIZEN, DRIVER, OPERATOR, SUPER_ADMIN |
+| reports      | 4002   | ✅ Funcional    | Bug shared/auth corregido                    |
+| geo          | 4003   | ✅ Funcional    | Basico — sin PostGIS real                    |
+| notifications| 4004   | ✅ Funcional    | Sin push FCM real                            |
+| transport    | 4005   | ✅ Implementado | REST + WebSocket; fares hardcodeadas         |
+| wallet       | 4006   | ✅ Implementado | Escrow completo; recarga/retiro sin PSP real |
+| catalog      | 4007   | ✅ Implementado | Seed incluido; sin CRUD de operador          |
+| orders       | 4008   | ✅ Implementado | RESTAURANT + STORE; delivery fee hardcodeado |
+| mandados     | 4009   | ✅ Implementado | Fares hardcodeadas en codigo                 |
+| pets         | 4010   | ✅ Implementado | Adopcion + mascotas perdidas                 |
+| sos          | 4011   | ✅ Implementado | Alerta + attend/resolve                      |
+
+### 14.2 Pantallas frontend — estado real
+
+| Modulo      | Pantallas implementadas                                                  | Gap principal                           |
+|-------------|--------------------------------------------------------------------------|-----------------------------------------|
+| Auth        | Welcome, Login, Register                                                 | Opcion "soy conductor" en register      |
+| Home        | HomeScreen (6 modulos activos)                                           | Deteccion GPS real                      |
+| Transporte  | Booking, TripConfirmation, TripTracking, TripSummary, TripHistory        | Mapa real (Mapbox/Google)               |
+| Driver      | DriverDashboard, TripRequest                                             | Pagos tab, Rutas tab                    |
+| Food        | RestaurantList, RestaurantMenu, OrderConfirmation, OrderTracking, OrderDelivered | Calificacion real al backend |
+| Tiendas     | StoreList, StoreProducts (con carrito inline)                            | Panel de gestión del operador           |
+| Mandados    | MandadosMenu, MandadoRequest, MandadoConfirmation, MandadoTracking, MandadoSummary | Tracking en tiempo real        |
+| Mascotas    | PetList (adopcion + perdidas), PetDetail                                 | Foto upload real                        |
+| SOS         | SOSScreen (conectado a API)                                              | GPS real, mapa en pantalla              |
+| Billetera   | WalletScreen                                                             | Recarga real (PSP), retiro, historial   |
+| Operador    | RestaurantPanelScreen                                                    | Panel tienda, gestion catalogo          |
+| Perfil      | ProfileScreen                                                            | Historiales cruzados, edicion de datos  |
+
+### 14.3 Gaps criticos para produccion (prioridad)
+
+1. **`platform_config` table** — tarifas y comisiones en DB, no en codigo
+2. **Onboarding de partners** — flujo de registro y aprobacion de comercios
+3. **Panel de gestion de catalogo** — operadores cargan sus propios productos
+4. **PSP real** — integracion Yape/Plin/Culqi para recargar billetera (pasarela pendiente de definir)
+5. **Retiros** — flujo de retiro de ganancias para conductores y operadores
+6. **Mapas reales** — Mapbox o Google Maps en BookingScreen y TripTrackingScreen
+7. **Push notifications reales** — FCM para estados de pedidos y viajes
+8. **Image search para productos** — API de busqueda de imagenes para operadores
+
+---
+
+*specs.md v4.0.0 — Actualizado el 2026-03-16*
+*Secciones 13-14 nuevas: Modelo de negocio + monetizacion + estado real del codigo*
