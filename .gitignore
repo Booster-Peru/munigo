@@ -39,3 +39,14 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# MuniGo Custom Ignores
+*.txt
+*.log
+.antigravity/team/locks/
+.env
+.env.local
+coverage/
+lint_output.json
+test_output*.txt
+home_screen_test_output.txt
