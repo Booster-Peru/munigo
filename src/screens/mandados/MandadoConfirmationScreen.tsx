@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View, Text, StyleSheet, TouchableOpacity, ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -60,7 +58,9 @@ export default function MandadoConfirmationScreen() {
             <View style={styles.separator} />
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Descripción</Text>
-              <Text style={[styles.detailValue, { flex: 1, textAlign: 'right' }]}>{mandado.description}</Text>
+              <Text style={[styles.detailValue, { flex: 1, textAlign: 'right' }]}>
+                {mandado.description}
+              </Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.detailRow}>
@@ -85,10 +85,7 @@ export default function MandadoConfirmationScreen() {
           <Text style={styles.trackBtnText}>SEGUIR MI MANDADO</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.homeBtn}
-          onPress={() => navigation.navigate('Dashboard')}
-        >
+        <TouchableOpacity style={styles.homeBtn} onPress={() => navigation.navigate('Dashboard')}>
           <Text style={styles.homeBtnText}>Volver al inicio</Text>
         </TouchableOpacity>
       </View>
@@ -100,26 +97,40 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16 },
   checkCircle: {
-    width: 88, height: 88, borderRadius: 44,
-    backgroundColor: '#059669', alignItems: 'center', justifyContent: 'center',
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: '#059669',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
   },
   title: { fontSize: 24, fontWeight: '800', color: theme.colors.text },
   sub: { fontSize: 14, color: theme.colors.textSecondary, marginBottom: 8 },
   detailCard: {
-    width: '100%', backgroundColor: theme.colors.surface,
+    width: '100%',
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.large,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     padding: 16,
   },
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 8 },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 8,
+  },
   detailLabel: { fontSize: 13, color: theme.colors.textSecondary, fontWeight: '600' },
   detailValue: { fontSize: 13, fontWeight: '700', color: theme.colors.text },
   separator: { height: 1, backgroundColor: theme.colors.border },
   trackBtn: {
-    width: '100%', backgroundColor: theme.colors.primary,
-    borderRadius: theme.roundness.medium, paddingVertical: 16,
-    alignItems: 'center', marginTop: 8,
+    width: '100%',
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.roundness.medium,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 8,
   },
   trackBtnText: { fontSize: 15, fontWeight: '800', color: theme.colors.text },
   homeBtn: { paddingVertical: 10 },

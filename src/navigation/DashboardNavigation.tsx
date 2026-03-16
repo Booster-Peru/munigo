@@ -36,9 +36,7 @@ const DashboardNavigation = () => {
         component={HomeScreen}
         options={{
           tabBarLabel: 'INICIO',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tab.Screen
@@ -46,9 +44,7 @@ const DashboardNavigation = () => {
         component={BookingScreen}
         options={{
           tabBarLabel: 'VIAJES',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bicycle" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Ionicons name="bicycle" size={size} color={color} />,
         }}
       />
       <Tab.Screen
@@ -66,9 +62,7 @@ const DashboardNavigation = () => {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'PERFIL',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
         }}
       />
     </Tab.Navigator>

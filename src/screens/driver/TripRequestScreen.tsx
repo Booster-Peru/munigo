@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -32,8 +25,8 @@ export default function TripRequestScreen() {
     try {
       await acceptTrip(tripId, token);
       navigation.replace('TripTracking', { tripId });
-    } catch (e: any) {
-      Alert.alert('Error', e.message || 'No se pudo aceptar el viaje');
+    } catch (e: unknown) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'No se pudo aceptar el viaje');
     } finally {
       setLoading(false);
     }
@@ -43,7 +36,9 @@ export default function TripRequestScreen() {
     if (!token) return;
     try {
       await cancelTrip(tripId, token);
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
     navigation.goBack();
   };
 
@@ -65,7 +60,9 @@ export default function TripRequestScreen() {
         </View>
         <View style={styles.routeConnector}>
           <View style={styles.routeDots}>
-            {[0, 1, 2].map((i) => <View key={i} style={styles.routeDot} />)}
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={styles.routeDot} />
+            ))}
           </View>
         </View>
         <View style={styles.routeRow}>
@@ -107,12 +104,22 @@ export default function TripRequestScreen() {
 
       {/* Action buttons */}
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.rejectBtn} onPress={handleReject} activeOpacity={0.85} disabled={loading}>
+        <TouchableOpacity
+          style={styles.rejectBtn}
+          onPress={handleReject}
+          activeOpacity={0.85}
+          disabled={loading}
+        >
           <Ionicons name="close" size={22} color="#dc2626" />
           <Text style={styles.rejectText}>Rechazar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.acceptBtn} onPress={handleAccept} activeOpacity={0.85} disabled={loading}>
+        <TouchableOpacity
+          style={styles.acceptBtn}
+          onPress={handleAccept}
+          activeOpacity={0.85}
+          disabled={loading}
+        >
           {loading ? (
             <ActivityIndicator color={theme.colors.text} />
           ) : (
@@ -131,7 +138,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    paddingHorizontal: 16, paddingVertical: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 18,
     alignItems: 'center',
   },
   headerTitle: { color: '#fff', fontSize: 18, fontWeight: '800' },
@@ -141,16 +149,25 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: theme.roundness.medium,
     padding: 16,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   routeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   routeIconOrigin: {
-    width: 28, height: 28, borderRadius: 14,
-    backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#eff6ff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   routeIconDest: {
-    width: 28, height: 28, borderRadius: 14,
-    backgroundColor: '#fef3c7', alignItems: 'center', justifyContent: 'center',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fef3c7',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   routeLabel: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
   routeConnector: { paddingLeft: 13, paddingVertical: 4 },
@@ -162,15 +179,24 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.medium,
     padding: 16,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   infoItem: { flex: 1, alignItems: 'center', gap: 6 },
   infoDivider: { width: 1, backgroundColor: theme.colors.border },
-  infoLabel: { fontSize: 9, fontWeight: '700', color: theme.colors.textSecondary, letterSpacing: 1 },
+  infoLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 1,
+  },
   infoValue: { fontSize: 16, fontWeight: '800', color: theme.colors.text },
   paymentRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    marginHorizontal: 16, marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginTop: 12,
     backgroundColor: '#eff6ff',
     borderRadius: theme.roundness.medium,
     padding: 12,
@@ -183,16 +209,25 @@ const styles = StyleSheet.create({
   },
   rejectBtn: {
     flex: 1,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    borderWidth: 1.5, borderColor: '#dc2626',
-    borderRadius: theme.roundness.medium, padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: '#dc2626',
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   rejectText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
   acceptBtn: {
     flex: 2,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     backgroundColor: theme.colors.accent,
-    borderRadius: theme.roundness.medium, padding: 18,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   acceptText: { fontSize: 15, fontWeight: '800', color: theme.colors.text },
 });

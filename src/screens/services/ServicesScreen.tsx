@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -15,22 +9,25 @@ import { RootStackParamList } from '../../types/navigation';
 
 type ServiceType = 'restaurantes' | 'tiendas';
 
-const CONFIG: Record<ServiceType, {
-  title: string;
-  filters: string[];
-  items: Array<{
-    id: string;
-    name: string;
-    category: string;
-    time: string;
-    delivery: string;
-    rating: number;
-    recommended?: boolean;
-    iconName: string;
-    iconBg: string;
-    iconColor: string;
-  }>;
-}> = {
+const CONFIG: Record<
+  ServiceType,
+  {
+    title: string;
+    filters: string[];
+    items: Array<{
+      id: string;
+      name: string;
+      category: string;
+      time: string;
+      delivery: string;
+      rating: number;
+      recommended?: boolean;
+      iconName: string;
+      iconBg: string;
+      iconColor: string;
+    }>;
+  }
+> = {
   restaurantes: {
     title: 'Restaurantes en Cancas',
     filters: ['Destacados', 'Comida de mar', 'Criollo', 'Rápida', 'Postres'],
@@ -105,7 +102,8 @@ const CONFIG: Record<ServiceType, {
 export default function ServicesScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute();
-  const serviceType: ServiceType = (route.params as any)?.type ?? 'restaurantes';
+  const serviceType: ServiceType =
+    (route.params as { type?: ServiceType } | undefined)?.type ?? 'restaurantes';
   const config = CONFIG[serviceType];
   const [activeFilter, setActiveFilter] = useState(config.filters[0]);
 
@@ -160,7 +158,11 @@ export default function ServicesScreen() {
           >
             {/* Image placeholder */}
             <View style={[styles.placeImage, { backgroundColor: place.iconBg }]}>
-              <Ionicons name={place.iconName as any} size={40} color={place.iconColor} />
+              <Ionicons
+                name={place.iconName as React.ComponentProps<typeof Ionicons>['name']}
+                size={40}
+                color={place.iconColor}
+              />
               {place.recommended && (
                 <View style={styles.recommendedBadge}>
                   <Text style={styles.recommendedText}>Recomendado</Text>

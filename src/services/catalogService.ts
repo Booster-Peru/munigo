@@ -48,11 +48,6 @@ export interface Product {
   category: string;
 }
 
-const h = (token?: string) => ({
-  'Content-Type': 'application/json',
-  ...(token ? { Authorization: `Bearer ${token}` } : {}),
-});
-
 export async function listRestaurants(category?: string): Promise<Restaurant[]> {
   const params = category ? `?category=${encodeURIComponent(category)}` : '';
   const res = await fetch(`${API_BASE_URL}/v1/catalog/restaurants${params}`);
@@ -61,7 +56,9 @@ export async function listRestaurants(category?: string): Promise<Restaurant[]> 
   return data.restaurants;
 }
 
-export async function getRestaurant(id: string): Promise<{ restaurant: Restaurant; menu: MenuItem[] }> {
+export async function getRestaurant(
+  id: string,
+): Promise<{ restaurant: Restaurant; menu: MenuItem[] }> {
   const res = await fetch(`${API_BASE_URL}/v1/catalog/restaurants/${id}`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Error loading restaurant');

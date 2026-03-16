@@ -37,13 +37,16 @@ const h = (token: string) => ({
   Authorization: `Bearer ${token}`,
 });
 
-export async function placeOrder(params: {
-  source_type: 'RESTAURANT' | 'STORE';
-  source_id: string;
-  items: OrderItem[];
-  delivery_address?: string;
-  notes?: string;
-}, token: string): Promise<Order> {
+export async function placeOrder(
+  params: {
+    source_type: 'RESTAURANT' | 'STORE';
+    source_id: string;
+    items: OrderItem[];
+    delivery_address?: string;
+    notes?: string;
+  },
+  token: string,
+): Promise<Order> {
   const res = await fetch(`${API_BASE_URL}/v1/orders`, {
     method: 'POST',
     headers: h(token),
@@ -62,7 +65,9 @@ export async function getActiveOrder(token: string): Promise<Order | null> {
 }
 
 export async function getOrderHistory(token: string, limit = 20): Promise<Order[]> {
-  const res = await fetch(`${API_BASE_URL}/v1/orders/history?limit=${limit}`, { headers: h(token) });
+  const res = await fetch(`${API_BASE_URL}/v1/orders/history?limit=${limit}`, {
+    headers: h(token),
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Error fetching history');
   return data.orders;

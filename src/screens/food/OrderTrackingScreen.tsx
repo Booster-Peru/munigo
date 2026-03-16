@@ -12,15 +12,22 @@ import { getOrder, cancelOrder, Order, OrderStatus } from '../../services/orders
 type NavProp = StackNavigationProp<RootStackParamList>;
 
 const STEPS: Array<{ status: OrderStatus; label: string; icon: string }> = [
-  { status: 'PENDING',    label: 'Pedido recibido',    icon: 'receipt-outline' },
-  { status: 'ACCEPTED',   label: 'Aceptado',           icon: 'checkmark-circle-outline' },
-  { status: 'PREPARING',  label: 'En preparación',     icon: 'flame-outline' },
-  { status: 'READY',      label: 'Listo para envío',   icon: 'bag-check-outline' },
-  { status: 'DELIVERING', label: 'En camino',          icon: 'bicycle-outline' },
-  { status: 'DELIVERED',  label: '¡Entregado!',        icon: 'home-outline' },
+  { status: 'PENDING', label: 'Pedido recibido', icon: 'receipt-outline' },
+  { status: 'ACCEPTED', label: 'Aceptado', icon: 'checkmark-circle-outline' },
+  { status: 'PREPARING', label: 'En preparación', icon: 'flame-outline' },
+  { status: 'READY', label: 'Listo para envío', icon: 'bag-check-outline' },
+  { status: 'DELIVERING', label: 'En camino', icon: 'bicycle-outline' },
+  { status: 'DELIVERED', label: '¡Entregado!', icon: 'home-outline' },
 ];
 
-const STATUS_ORDER: OrderStatus[] = ['PENDING','ACCEPTED','PREPARING','READY','DELIVERING','DELIVERED'];
+const STATUS_ORDER: OrderStatus[] = [
+  'PENDING',
+  'ACCEPTED',
+  'PREPARING',
+  'READY',
+  'DELIVERING',
+  'DELIVERED',
+];
 
 export default function OrderTrackingScreen() {
   const navigation = useNavigation<NavProp>();
@@ -32,10 +39,12 @@ export default function OrderTrackingScreen() {
 
   const fetchOrder = () => {
     if (!token) return;
-    getOrder(orderId, token).then(o => {
-      setOrder(o);
-      if (o.status === 'DELIVERED') navigation.replace('OrderDelivered', { orderId });
-    }).finally(() => setLoading(false));
+    getOrder(orderId, token)
+      .then((o) => {
+        setOrder(o);
+        if (o.status === 'DELIVERED') navigation.replace('OrderDelivered', { orderId });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -48,13 +57,16 @@ export default function OrderTrackingScreen() {
     Alert.alert('¿Cancelar pedido?', 'Solo puedes cancelar mientras el pedido está pendiente.', [
       { text: 'No', style: 'cancel' },
       {
-        text: 'Cancelar pedido', style: 'destructive',
+        text: 'Cancelar pedido',
+        style: 'destructive',
         onPress: async () => {
           if (!token) return;
           try {
             await cancelOrder(orderId, token);
             navigation.navigate('Dashboard');
-          } catch (e: any) { Alert.alert('Error', e.message); }
+          } catch (e: unknown) {
+            Alert.alert('Error', e instanceof Error ? e.message : 'Error');
+          }
         },
       },
     ]);
@@ -103,18 +115,35 @@ export default function OrderTrackingScreen() {
           return (
             <View key={step.status} style={styles.stepRow}>
               <View style={styles.stepLeft}>
-                <View style={[styles.stepCircle, done && styles.stepCircleDone, active && styles.stepCircleActive]}>
+                <View
+                  style={[
+                    styles.stepCircle,
+                    done && styles.stepCircleDone,
+                    active && styles.stepCircleActive,
+                  ]}
+                >
                   <Ionicons
-                    name={step.icon as any}
+                    name={step.icon as React.ComponentProps<typeof Ionicons>['name']}
                     size={16}
                     color={done ? '#fff' : theme.colors.border}
                   />
                 </View>
                 {i < STEPS.length - 1 && (
-                  <View style={[styles.stepConnector, done && i < currentIdx && styles.stepConnectorDone]} />
+                  <View
+                    style={[
+                      styles.stepConnector,
+                      done && i < currentIdx && styles.stepConnectorDone,
+                    ]}
+                  />
                 )}
               </View>
-              <Text style={[styles.stepLabel, done && styles.stepLabelDone, active && styles.stepLabelActive]}>
+              <Text
+                style={[
+                  styles.stepLabel,
+                  done && styles.stepLabelDone,
+                  active && styles.stepLabelActive,
+                ]}
+              >
                 {step.label}
               </Text>
             </View>
@@ -139,44 +168,76 @@ export default function OrderTrackingScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
-    backgroundColor: '#1a2340', flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14,
+    backgroundColor: '#1a2340',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
   headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, textAlign: 'center', marginTop: 1 },
   etaCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#eff6ff', margin: 16,
-    borderRadius: theme.roundness.medium, padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#eff6ff',
+    margin: 16,
+    borderRadius: theme.roundness.medium,
+    padding: 14,
   },
-  etaLabel: { fontSize: 10, fontWeight: '700', color: theme.colors.textSecondary, letterSpacing: 0.8 },
+  etaLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.8,
+  },
   etaValue: { fontSize: 18, fontWeight: '800', color: theme.colors.text },
   refreshBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   stepsCard: {
-    backgroundColor: theme.colors.surface, marginHorizontal: 16,
-    borderRadius: theme.roundness.large, padding: 20,
-    borderWidth: 1, borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    marginHorizontal: 16,
+    borderRadius: theme.roundness.large,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   stepRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 14 },
   stepLeft: { alignItems: 'center', width: 32 },
   stepCircle: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: theme.colors.border,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
   },
   stepCircleDone: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
   stepCircleActive: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
   stepConnector: { width: 2, height: 24, backgroundColor: theme.colors.border, marginTop: 2 },
   stepConnectorDone: { backgroundColor: theme.colors.primary },
-  stepLabel: { fontSize: 14, color: theme.colors.textSecondary, paddingTop: 6, flex: 1, paddingBottom: 16 },
+  stepLabel: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    paddingTop: 6,
+    flex: 1,
+    paddingBottom: 16,
+  },
   stepLabelDone: { color: theme.colors.text },
   stepLabelActive: { fontWeight: '700', color: theme.colors.primary },
   footer: { padding: 16 },
   cancelBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    borderWidth: 1.5, borderColor: '#dc2626',
-    borderRadius: theme.roundness.medium, padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: '#dc2626',
+    borderRadius: theme.roundness.medium,
+    padding: 16,
   },
   cancelText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
 });

@@ -40,7 +40,7 @@ export async function createMandado(
     delivery_address: string;
     notes?: string;
   },
-  token: string
+  token: string,
 ): Promise<Mandado> {
   const data = await apiFetch('/mandados', 'POST', token, payload);
   return data.mandado;

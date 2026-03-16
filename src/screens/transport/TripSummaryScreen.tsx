@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { theme } from '../../config/theme';
 import { RootStackParamList } from '../../types/navigation';
@@ -19,8 +13,6 @@ type NavProp = StackNavigationProp<RootStackParamList>;
 
 export default function TripSummaryScreen() {
   const navigation = useNavigation<NavProp>();
-  const route = useRoute();
-  const { tripId } = route.params as { tripId: string };
   const { token } = useAuth();
 
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -30,7 +22,9 @@ export default function TripSummaryScreen() {
   useEffect(() => {
     if (!token) return;
     // Fetch the specific trip by falling back to history
-    getActiveTrip(token).then(setTrip).catch(() => {});
+    getActiveTrip(token)
+      .then(setTrip)
+      .catch(() => {});
   }, [token]);
 
   const handleRate = (stars: number) => {
@@ -119,7 +113,10 @@ export default function TripSummaryScreen() {
             <Ionicons name="arrow-forward" size={18} color={theme.colors.text} />
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.historyBtn} onPress={() => navigation.navigate('TripHistory')}>
+        <TouchableOpacity
+          style={styles.historyBtn}
+          onPress={() => navigation.navigate('TripHistory')}
+        >
           <Text style={styles.historyText}>Ver historial de viajes</Text>
         </TouchableOpacity>
       </View>
@@ -131,20 +128,30 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    paddingHorizontal: 16, paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
-  headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, textAlign: 'center', letterSpacing: 0.8, marginTop: 1 },
+  headerSub: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    textAlign: 'center',
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
   successSection: {
     alignItems: 'center',
     paddingVertical: 28,
     gap: 8,
   },
   successCircle: {
-    width: 80, height: 80, borderRadius: 40,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: '#059669',
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 4,
   },
   successTitle: { fontSize: 20, fontWeight: '800', color: theme.colors.text },
@@ -163,13 +170,21 @@ const styles = StyleSheet.create({
   paymentText: { color: 'rgba(255,255,255,0.85)', fontSize: 13 },
   detailsCard: {
     backgroundColor: theme.colors.surface,
-    marginHorizontal: 16, marginTop: 14,
+    marginHorizontal: 16,
+    marginTop: 14,
     borderRadius: theme.roundness.medium,
     padding: 14,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   detailRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  detailDivider: { width: 2, height: 16, backgroundColor: theme.colors.border, marginLeft: 7, marginVertical: 3 },
+  detailDivider: {
+    width: 2,
+    height: 16,
+    backgroundColor: theme.colors.border,
+    marginLeft: 7,
+    marginVertical: 3,
+  },
   detailText: { fontSize: 13, fontWeight: '600', color: theme.colors.text },
   ratingCard: {
     alignItems: 'center',
@@ -180,9 +195,13 @@ const styles = StyleSheet.create({
   starsRow: { flexDirection: 'row', gap: 8 },
   footer: { padding: 16, gap: 10 },
   ctaBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
     backgroundColor: theme.colors.accent,
-    borderRadius: theme.roundness.medium, padding: 18,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   ctaText: { fontSize: 15, fontWeight: '800', color: theme.colors.text, letterSpacing: 0.5 },
   historyBtn: { alignItems: 'center', padding: 10 },

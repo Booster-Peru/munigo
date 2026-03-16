@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
-  SectionList, ActivityIndicator, Alert,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SectionList,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,14 +57,14 @@ export default function StoreProductsScreen() {
   const cartCount = Object.values(cart).reduce((s, ci) => s + ci.qty, 0);
 
   const inc = useCallback((p: Product) => {
-    setCart(prev => ({
+    setCart((prev) => ({
       ...prev,
       [p.id]: { product: p, qty: (prev[p.id]?.qty || 0) + 1 },
     }));
   }, []);
 
   const dec = useCallback((p: Product) => {
-    setCart(prev => {
+    setCart((prev) => {
       const cur = prev[p.id]?.qty || 0;
       if (cur <= 1) {
         const next = { ...prev };
@@ -74,7 +79,7 @@ export default function StoreProductsScreen() {
     if (cartCount === 0 || !store) return;
     setPlacing(true);
     try {
-      const items = Object.values(cart).map(ci => ({
+      const items = Object.values(cart).map((ci) => ({
         item_id: ci.product.id,
         name: ci.product.name,
         unit_price: Number(ci.product.price),
@@ -82,11 +87,11 @@ export default function StoreProductsScreen() {
       }));
       const order = await placeOrder(
         { source_id: storeId, source_type: 'STORE', items, delivery_address: 'Mi dirección' },
-        token
+        token,
       );
       navigation.navigate('OrderConfirmation', { orderId: order.id });
-    } catch (e: any) {
-      Alert.alert('Error', e.message);
+    } catch (e: unknown) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Error');
     } finally {
       setPlacing(false);
     }
@@ -118,7 +123,7 @@ export default function StoreProductsScreen() {
 
       <SectionList
         sections={sections}
-        keyExtractor={p => p.id}
+        keyExtractor={(p) => p.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: cartCount > 0 ? 90 : 24 }}
         renderSectionHeader={({ section }) => (
@@ -161,10 +166,11 @@ export default function StoreProductsScreen() {
           <Text style={styles.cartBarText}>Ver pedido</Text>
           <Text style={styles.cartBarTotal}>S/ {cartTotal.toFixed(2)}</Text>
           <TouchableOpacity style={styles.cartCta} onPress={handleOrder} disabled={placing}>
-            {placing
-              ? <ActivityIndicator size="small" color={theme.colors.text} />
-              : <Text style={styles.cartCtaText}>PEDIR</Text>
-            }
+            {placing ? (
+              <ActivityIndicator size="small" color={theme.colors.text} />
+            ) : (
+              <Text style={styles.cartCtaText}>PEDIR</Text>
+            )}
           </TouchableOpacity>
         </View>
       )}
@@ -208,23 +214,41 @@ const styles = StyleSheet.create({
   productPrice: { fontSize: 14, fontWeight: '700', color: theme.colors.primary, marginTop: 4 },
   qtyControl: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   qtyBtn: {
-    width: 30, height: 30, borderRadius: 15,
-    borderWidth: 1.5, borderColor: theme.colors.primary,
-    alignItems: 'center', justifyContent: 'center',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 1.5,
+    borderColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   qtyBtnAdd: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
-  qtyText: { fontSize: 15, fontWeight: '700', color: theme.colors.text, minWidth: 20, textAlign: 'center' },
+  qtyText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.text,
+    minWidth: 20,
+    textAlign: 'center',
+  },
   cartBar: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     gap: 10,
   },
   cartBadge: {
     backgroundColor: theme.colors.primary,
-    borderRadius: 10, minWidth: 22, height: 22,
-    alignItems: 'center', justifyContent: 'center',
+    borderRadius: 10,
+    minWidth: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 4,
   },
   cartBadgeText: { color: theme.colors.text, fontSize: 12, fontWeight: '700' },
@@ -232,7 +256,9 @@ const styles = StyleSheet.create({
   cartBarTotal: { color: '#fff', fontSize: 14, fontWeight: '700' },
   cartCta: {
     backgroundColor: theme.colors.primary,
-    borderRadius: 8, paddingHorizontal: 18, paddingVertical: 8,
+    borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
   },
   cartCtaText: { color: theme.colors.text, fontSize: 13, fontWeight: '800' },
 });

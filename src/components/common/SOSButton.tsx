@@ -14,7 +14,7 @@ export const SOSButton = ({ onPress }: SOSButtonProps) => {
       Animated.sequence([
         Animated.timing(pulse, { toValue: 1.12, duration: 800, useNativeDriver: true }),
         Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
-      ])
+      ]),
     );
     animation.start();
     return () => animation.stop();

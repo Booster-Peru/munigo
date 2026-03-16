@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -50,46 +50,38 @@ export default function SOSScreen() {
   const navigation = useNavigation();
   const { token } = useAuth();
   const pulse = useRef(new Animated.Value(1)).current;
-  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, { toValue: 1.15, duration: 900, useNativeDriver: true }),
         Animated.timing(pulse, { toValue: 1, duration: 900, useNativeDriver: true }),
-      ])
+      ]),
     );
     anim.start();
     return () => anim.stop();
   }, [pulse]);
 
   const handleSOS = () => {
-    Alert.alert(
-      '¿Activar SOS?',
-      'Se notificará a Policía y Serenazgo con tu ubicación actual.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Activar SOS',
-          style: 'destructive',
-          onPress: async () => {
-            setSending(true);
-            try {
-              await sendSOSAlert(
-                { type: 'GENERAL', description: 'Alerta SOS desde app MuniGo' },
-                token
-              );
-              Alert.alert('SOS Activado', 'Policía y Serenazgo han sido notificados.');
-            } catch {
-              // Fire-and-forget: show success even if backend unavailable
-              Alert.alert('SOS Activado', 'Policía y Serenazgo han sido notificados.');
-            } finally {
-              setSending(false);
-            }
-          },
+    Alert.alert('¿Activar SOS?', 'Se notificará a Policía y Serenazgo con tu ubicación actual.', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Activar SOS',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await sendSOSAlert(
+              { type: 'GENERAL', description: 'Alerta SOS desde app MuniGo' },
+              token,
+            );
+            Alert.alert('SOS Activado', 'Policía y Serenazgo han sido notificados.');
+          } catch {
+            // Fire-and-forget: show success even if backend unavailable
+            Alert.alert('SOS Activado', 'Policía y Serenazgo han sido notificados.');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -108,7 +100,11 @@ export default function SOSScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.contentInner}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Headline */}
         <Text style={styles.headline}>Need Immediate Help?</Text>
         <Text style={styles.subtext}>
@@ -130,7 +126,11 @@ export default function SOSScreen() {
         {CONTACTS.map((c) => (
           <View key={c.id} style={styles.contactRow}>
             <View style={[styles.contactIcon, { backgroundColor: c.iconBg }]}>
-              <Ionicons name={c.iconName as any} size={20} color={c.iconColor} />
+              <Ionicons
+                name={c.iconName as React.ComponentProps<typeof Ionicons>['name']}
+                size={20}
+                color={c.iconColor}
+              />
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactTitle}>{c.title}</Text>
@@ -171,8 +171,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
@@ -180,52 +183,116 @@ const styles = StyleSheet.create({
   headerRight: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   content: { flex: 1 },
   contentInner: { padding: 20, alignItems: 'center' },
-  headline: { fontSize: 22, fontWeight: '700', color: theme.colors.text, alignSelf: 'flex-start', marginBottom: 8 },
-  subtext: { fontSize: 13, color: theme.colors.textSecondary, lineHeight: 19, alignSelf: 'flex-start', marginBottom: 32 },
-  sosWrapper: { alignItems: 'center', justifyContent: 'center', width: 140, height: 140, marginBottom: 12 },
+  headline: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.text,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  subtext: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    lineHeight: 19,
+    alignSelf: 'flex-start',
+    marginBottom: 32,
+  },
+  sosWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 140,
+    height: 140,
+    marginBottom: 12,
+  },
   sosRing: {
-    position: 'absolute', width: 140, height: 140, borderRadius: 70,
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: 'rgba(220, 38, 38, 0.15)',
   },
   sosBtn: {
-    width: 110, height: 110, borderRadius: 55,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     backgroundColor: '#dc2626',
-    alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#dc2626', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5, shadowRadius: 12, elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#dc2626',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 8,
     gap: 4,
   },
   sosLabel: { color: '#fff', fontSize: 16, fontWeight: '800', letterSpacing: 2 },
   sosCaption: {
-    fontSize: 12, fontWeight: '700', color: '#0d9488',
-    letterSpacing: 1, marginBottom: 32,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#0d9488',
+    letterSpacing: 1,
+    marginBottom: 32,
   },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text, alignSelf: 'flex-start', marginBottom: 12 },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
   contactRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
     width: '100%',
   },
-  contactIcon: { width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  contactIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   contactInfo: { flex: 1 },
   contactTitle: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
   contactSub: { fontSize: 12, color: theme.colors.textSecondary, marginTop: 1 },
   callBtn: {
-    width: 38, height: 38, borderRadius: 19,
-    borderWidth: 1.5, borderColor: '#0d9488',
-    alignItems: 'center', justifyContent: 'center',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1.5,
+    borderColor: '#0d9488',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   locationCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: theme.colors.background, borderRadius: theme.roundness.medium,
-    padding: 14, marginTop: 20, width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.roundness.medium,
+    padding: 14,
+    marginTop: 20,
+    width: '100%',
   },
   locationIcon: {
-    width: 38, height: 38, borderRadius: 10,
-    backgroundColor: '#ccfbf1', alignItems: 'center', justifyContent: 'center',
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: '#ccfbf1',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   locationInfo: { flex: 1 },
-  locationLabel: { fontSize: 9, color: theme.colors.textSecondary, fontWeight: '600', letterSpacing: 1 },
+  locationLabel: {
+    fontSize: 9,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+    letterSpacing: 1,
+  },
   locationPlace: { fontSize: 13, fontWeight: '600', color: theme.colors.text, marginTop: 2 },
   gpsStatus: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   gpsDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#059669' },

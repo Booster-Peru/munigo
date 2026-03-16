@@ -1,21 +1,35 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks/useAuth';
 import { theme } from '../../config/theme';
 
 const RECENT_TRIPS = [
-  { id: '1', destination: 'Plaza de Armas', time: '13:45', distance: '2.4 km', fare: 7.00, icon: 'location-outline' },
-  { id: '2', destination: 'Hotel Punta Sal', time: '13:45', distance: '5.1 km', fare: 12.50, icon: 'business-outline' },
-  { id: '3', destination: 'Rest. El Velero', time: '12:30', distance: '1.8 km', fare: 6.00, icon: 'restaurant-outline' },
+  {
+    id: '1',
+    destination: 'Plaza de Armas',
+    time: '13:45',
+    distance: '2.4 km',
+    fare: 7.0,
+    icon: 'location-outline',
+  },
+  {
+    id: '2',
+    destination: 'Hotel Punta Sal',
+    time: '13:45',
+    distance: '5.1 km',
+    fare: 12.5,
+    icon: 'business-outline',
+  },
+  {
+    id: '3',
+    destination: 'Rest. El Velero',
+    time: '12:30',
+    distance: '1.8 km',
+    fare: 6.0,
+    icon: 'restaurant-outline',
+  },
 ];
 
 export default function DriverDashboardScreen() {
@@ -26,14 +40,10 @@ export default function DriverDashboardScreen() {
 
   const handleToggle = () => {
     if (!isAvailable) {
-      Alert.alert(
-        'Activar servicio',
-        '¿Empezar a recibir solicitudes de mototaxi?',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Activar', onPress: () => setIsAvailable(true) },
-        ]
-      );
+      Alert.alert('Activar servicio', '¿Empezar a recibir solicitudes de mototaxi?', [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Activar', onPress: () => setIsAvailable(true) },
+      ]);
     } else {
       setIsAvailable(false);
     }
@@ -52,11 +62,18 @@ export default function DriverDashboardScreen() {
           <View style={styles.headerInfo}>
             <Text style={styles.driverName}>{user?.fullName || 'Carlos Mendoza'}</Text>
             <View style={styles.statusRow}>
-              <View style={[styles.statusDot, isAvailable ? styles.dotOnline : styles.dotOffline]} />
-              <Text style={[styles.statusText, isAvailable ? styles.statusOnline : styles.statusOffline]}>
+              <View
+                style={[styles.statusDot, isAvailable ? styles.dotOnline : styles.dotOffline]}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  isAvailable ? styles.statusOnline : styles.statusOffline,
+                ]}
+              >
                 {isAvailable ? 'Disponible' : 'No disponible'}
               </Text>
-              <Text style={styles.driverId}>  ID: 45293</Text>
+              <Text style={styles.driverId}> ID: 45293</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.bellBtn}>
@@ -101,11 +118,17 @@ export default function DriverDashboardScreen() {
         {RECENT_TRIPS.map((trip) => (
           <View key={trip.id} style={styles.tripRow}>
             <View style={styles.tripIcon}>
-              <Ionicons name={trip.icon as any} size={18} color={theme.colors.primary} />
+              <Ionicons
+                name={trip.icon as React.ComponentProps<typeof Ionicons>['name']}
+                size={18}
+                color={theme.colors.primary}
+              />
             </View>
             <View style={styles.tripInfo}>
               <Text style={styles.tripDest}>{trip.destination}</Text>
-              <Text style={styles.tripMeta}>{trip.time} · {trip.distance}</Text>
+              <Text style={styles.tripMeta}>
+                {trip.time} · {trip.distance}
+              </Text>
             </View>
             <View style={styles.tripRight}>
               <Text style={styles.tripFare}>S/ {trip.fare.toFixed(2)}</Text>
@@ -153,13 +176,16 @@ export default function DriverDashboardScreen() {
           <TouchableOpacity
             key={tab.label}
             style={styles.navTab}
-            onPress={() => tab.label === 'Perfil' && Alert.alert('Cerrar sesión', '¿Cerrar sesión?', [
-              { text: 'Cancelar', style: 'cancel' },
-              { text: 'Salir', style: 'destructive', onPress: logout },
-            ])}
+            onPress={() =>
+              tab.label === 'Perfil' &&
+              Alert.alert('Cerrar sesión', '¿Cerrar sesión?', [
+                { text: 'Cancelar', style: 'cancel' },
+                { text: 'Salir', style: 'destructive', onPress: logout },
+              ])
+            }
           >
             <Ionicons
-              name={tab.icon as any}
+              name={tab.icon as React.ComponentProps<typeof Ionicons>['name']}
               size={22}
               color={tab.active ? theme.colors.primary : theme.colors.textSecondary}
             />
@@ -181,10 +207,14 @@ const styles = StyleSheet.create({
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 },
   avatar: {
-    width: 52, height: 52, borderRadius: 26,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   headerInfo: { flex: 1 },
   driverName: { color: '#fff', fontSize: 17, fontWeight: '700' },
@@ -207,16 +237,29 @@ const styles = StyleSheet.create({
   statLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 9, fontWeight: '600', letterSpacing: 1 },
   statValue: { color: '#fff', fontSize: 22, fontWeight: '800' },
   content: { flex: 1, padding: 16 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
   seeAll: { fontSize: 13, color: '#0d9488', fontWeight: '600' },
   tripRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
   tripIcon: {
-    width: 36, height: 36, borderRadius: 10,
-    backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center',
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tripInfo: { flex: 1 },
   tripDest: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
@@ -225,24 +268,40 @@ const styles = StyleSheet.create({
   tripFare: { fontSize: 14, fontWeight: '700', color: theme.colors.text },
   completedBadge: { fontSize: 11, color: '#059669', fontWeight: '600', marginTop: 2 },
   noticeBanner: {
-    flexDirection: 'row', alignItems: 'flex-start', gap: 8,
-    backgroundColor: '#eff6ff', borderRadius: theme.roundness.medium,
-    padding: 12, marginTop: 16, marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: '#eff6ff',
+    borderRadius: theme.roundness.medium,
+    padding: 12,
+    marginTop: 16,
+    marginBottom: 16,
   },
   noticeText: { flex: 1, fontSize: 12, color: theme.colors.text, lineHeight: 17 },
   activateBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
     backgroundColor: theme.colors.accent,
-    borderRadius: theme.roundness.medium, padding: 18,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   activateBtnOff: { backgroundColor: '#fee2e2' },
-  activateBtnText: { fontSize: 15, fontWeight: '800', color: theme.colors.text, letterSpacing: 0.5 },
+  activateBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: theme.colors.text,
+    letterSpacing: 0.5,
+  },
   activateBtnTextOff: { color: '#dc2626' },
   bottomNav: {
     flexDirection: 'row',
     backgroundColor: theme.colors.surface,
-    borderTopWidth: 1, borderTopColor: theme.colors.border,
-    paddingVertical: 8, paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    paddingVertical: 8,
+    paddingBottom: 16,
   },
   navTab: { flex: 1, alignItems: 'center', gap: 3 },
   navLabel: { fontSize: 10, color: theme.colors.textSecondary, fontWeight: '600' },

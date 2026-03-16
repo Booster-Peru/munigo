@@ -1,13 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Linking,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -34,7 +26,7 @@ export default function TripTrackingScreen() {
       Animated.sequence([
         Animated.timing(pulse, { toValue: 1.2, duration: 800, useNativeDriver: true }),
         Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
-      ])
+      ]),
     );
     anim.start();
     return () => anim.stop();
@@ -42,7 +34,9 @@ export default function TripTrackingScreen() {
 
   useEffect(() => {
     if (!token) return;
-    getActiveTrip(token).then(setTrip).catch(() => {});
+    getActiveTrip(token)
+      .then(setTrip)
+      .catch(() => {});
 
     const unsubscribe = subscribeToTrip(
       tripId,
@@ -95,8 +89,8 @@ export default function TripTrackingScreen() {
         await completeTrip(tripId, token);
         navigation.replace('TripSummary', { tripId });
       }
-    } catch (e: any) {
-      Alert.alert('Error', e.message);
+    } catch (e: unknown) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Error');
     }
   };
 
@@ -139,7 +133,7 @@ export default function TripTrackingScreen() {
           <View style={styles.driverMeta}>
             <Ionicons name="star" size={13} color={theme.colors.accent} />
             <Text style={styles.driverRating}>4.9</Text>
-            <Text style={styles.driverPlate}>  ·  ABC-123</Text>
+            <Text style={styles.driverPlate}> · ABC-123</Text>
           </View>
         </View>
         <TouchableOpacity
@@ -169,7 +163,11 @@ export default function TripTrackingScreen() {
       {/* Driver action button */}
       {isDriver && (
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.driverActionBtn} onPress={handleDriverAction} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={styles.driverActionBtn}
+            onPress={handleDriverAction}
+            activeOpacity={0.85}
+          >
             <Text style={styles.driverActionText}>
               {trip?.status === 'accepted' ? 'INICIAR VIAJE' : 'COMPLETAR VIAJE'}
             </Text>
@@ -194,12 +192,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
-  headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, textAlign: 'center', letterSpacing: 0.8, marginTop: 1 },
+  headerSub: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    textAlign: 'center',
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
   mapArea: {
     height: 200,
     backgroundColor: '#d1fae5',
@@ -208,32 +215,47 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   driverDot: {
-    width: 48, height: 48, borderRadius: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: theme.colors.primary,
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   mapLabel: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   mapLabelText: { fontSize: 13, fontWeight: '600', color: theme.colors.text },
   statusBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    marginHorizontal: 16, marginTop: 14,
-    backgroundColor: '#f0fdf4', borderRadius: theme.roundness.medium,
-    padding: 12, borderLeftWidth: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 14,
+    backgroundColor: '#f0fdf4',
+    borderRadius: theme.roundness.medium,
+    padding: 12,
+    borderLeftWidth: 4,
   },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
   statusText: { fontSize: 14, fontWeight: '700' },
   driverCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    marginHorizontal: 16, marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 16,
+    marginTop: 12,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.medium,
     padding: 14,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   driverAvatar: {
-    width: 48, height: 48, borderRadius: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#1a2340',
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   driverInfo: { flex: 1 },
   driverName: { fontSize: 15, fontWeight: '700', color: theme.colors.text },
@@ -241,33 +263,57 @@ const styles = StyleSheet.create({
   driverRating: { fontSize: 13, color: theme.colors.text, fontWeight: '600', marginLeft: 3 },
   driverPlate: { fontSize: 12, color: theme.colors.textSecondary },
   callBtn: {
-    width: 42, height: 42, borderRadius: 21,
-    borderWidth: 1.5, borderColor: '#0d9488',
-    alignItems: 'center', justifyContent: 'center',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: '#0d9488',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   fareRow: {
-    flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: 16, marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 12,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.medium,
     padding: 14,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   fareItem: { flex: 1, alignItems: 'center' },
-  fareItemLabel: { fontSize: 10, fontWeight: '700', color: theme.colors.textSecondary, letterSpacing: 0.8 },
+  fareItemLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.8,
+  },
   fareItemValue: { fontSize: 14, fontWeight: '700', color: theme.colors.text, marginTop: 3 },
   fareDivider: { width: 1, height: 32, backgroundColor: theme.colors.border },
   footer: { padding: 16 },
   driverActionBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
     backgroundColor: theme.colors.accent,
-    borderRadius: theme.roundness.medium, padding: 18,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
-  driverActionText: { fontSize: 15, fontWeight: '800', color: theme.colors.text, letterSpacing: 0.5 },
+  driverActionText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: theme.colors.text,
+    letterSpacing: 0.5,
+  },
   cancelBtn: {
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: theme.colors.border,
-    borderRadius: theme.roundness.medium, padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.roundness.medium,
+    padding: 16,
   },
   cancelText: { fontSize: 15, fontWeight: '600', color: theme.colors.textSecondary },
 });

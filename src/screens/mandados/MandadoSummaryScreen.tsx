@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View, Text, StyleSheet, TouchableOpacity, ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -63,7 +61,7 @@ export default function MandadoSummaryScreen() {
 
         <Text style={styles.ratingTitle}>¿Cómo estuvo el servicio?</Text>
         <View style={styles.stars}>
-          {[1, 2, 3, 4, 5].map(s => (
+          {[1, 2, 3, 4, 5].map((s) => (
             <TouchableOpacity key={s} onPress={() => setRating(s)}>
               <Ionicons
                 name={s <= rating ? 'star' : 'star-outline'}
@@ -90,16 +88,22 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 14 },
   checkCircle: {
-    width: 88, height: 88, borderRadius: 44,
-    backgroundColor: '#059669', alignItems: 'center', justifyContent: 'center',
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: '#059669',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 6,
   },
   title: { fontSize: 24, fontWeight: '800', color: theme.colors.text },
   sub: { fontSize: 14, color: theme.colors.textSecondary },
   summaryCard: {
-    width: '100%', backgroundColor: theme.colors.surface,
+    width: '100%',
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.large,
-    borderWidth: 1, borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     padding: 16,
   },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
@@ -109,9 +113,12 @@ const styles = StyleSheet.create({
   ratingTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text, marginTop: 8 },
   stars: { flexDirection: 'row', gap: 8 },
   ctaBtn: {
-    width: '100%', backgroundColor: theme.colors.primary,
-    borderRadius: theme.roundness.medium, paddingVertical: 16,
-    alignItems: 'center', marginTop: 8,
+    width: '100%',
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.roundness.medium,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 8,
   },
   ctaBtnText: { fontSize: 15, fontWeight: '800', color: theme.colors.text },
 });

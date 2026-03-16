@@ -76,7 +76,7 @@ export async function reportLostPet(
     contact: string;
     photo_url?: string;
   },
-  token: string
+  token: string,
 ): Promise<LostPet> {
   const data = await apiFetch('/lost', 'POST', token, payload);
   return data.lost;

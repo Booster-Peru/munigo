@@ -2,12 +2,7 @@ import { API_BASE_URL as API_URL } from '../config/api';
 
 export type TripType = 'standard' | 'premium';
 
-export type TripStatus =
-  | 'pending'
-  | 'accepted'
-  | 'in_progress'
-  | 'completed'
-  | 'cancelled';
+export type TripStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
 
 export interface Trip {
   id: string;
@@ -93,7 +88,9 @@ export function subscribeToTrip(
       const msg = JSON.parse(e.data);
       if (msg.type === 'trip_update') onUpdate(msg.trip);
       if (msg.type === 'driver_location') onLocation(msg.latitude, msg.longitude);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 
   return () => ws.close();

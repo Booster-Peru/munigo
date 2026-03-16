@@ -34,7 +34,11 @@ export default function OrderConfirmationScreen() {
     );
   }
 
-  const items = (order?.items || []) as Array<{ name: string; quantity: number; unit_price: number }>;
+  const items = (order?.items || []) as Array<{
+    name: string;
+    quantity: number;
+    unit_price: number;
+  }>;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -102,23 +106,40 @@ export default function OrderConfirmationScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
-    backgroundColor: '#1a2340', paddingHorizontal: 16, paddingVertical: 14, alignItems: 'center',
+    backgroundColor: '#1a2340',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
   },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700' },
   headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 1, letterSpacing: 0.8 },
   successSection: { alignItems: 'center', paddingVertical: 28, gap: 8 },
   successCircle: {
-    width: 72, height: 72, borderRadius: 36, backgroundColor: '#059669',
-    alignItems: 'center', justifyContent: 'center', marginBottom: 4,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#059669',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   successTitle: { fontSize: 20, fontWeight: '800', color: theme.colors.text },
   successSub: { fontSize: 13, color: theme.colors.textSecondary },
   card: {
-    backgroundColor: theme.colors.surface, marginHorizontal: 16,
-    borderRadius: theme.roundness.large, padding: 16,
-    borderWidth: 1, borderColor: theme.colors.border, gap: 8,
+    backgroundColor: theme.colors.surface,
+    marginHorizontal: 16,
+    borderRadius: theme.roundness.large,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    gap: 8,
   },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   cardTitle: { fontSize: 15, fontWeight: '700', color: theme.colors.text },
   orderId: { fontSize: 11, color: theme.colors.textSecondary, fontWeight: '600' },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -134,8 +155,13 @@ const styles = StyleSheet.create({
   grandTotalValue: { fontSize: 15, fontWeight: '800', color: theme.colors.primary },
   footer: { padding: 16, gap: 10 },
   trackBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-    backgroundColor: theme.colors.accent, borderRadius: theme.roundness.medium, padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   trackBtnText: { fontSize: 15, fontWeight: '800', color: theme.colors.text, letterSpacing: 0.5 },
   homeBtn: { alignItems: 'center', padding: 10 },

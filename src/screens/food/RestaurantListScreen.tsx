@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, FlatList, ActivityIndicator,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,11 +21,11 @@ type NavProp = StackNavigationProp<RootStackParamList>;
 const FILTERS = ['Todos', 'Comida de mar', 'Criollo', 'Rápida', 'Postres'];
 
 const ICON_MAP: Record<string, { name: string; bg: string; color: string }> = {
-  'Comida de mar': { name: 'fish-outline',       bg: '#d1fae5', color: '#059669' },
-  'Criollo':       { name: 'restaurant-outline',  bg: '#fef3c7', color: '#d97706' },
-  'Rápida':        { name: 'pizza-outline',        bg: '#fee2e2', color: '#dc2626' },
-  'Postres':       { name: 'ice-cream-outline',   bg: '#fce7f3', color: '#db2777' },
-  default:         { name: 'restaurant-outline',  bg: '#eff6ff', color: '#2563eb' },
+  'Comida de mar': { name: 'fish-outline', bg: '#d1fae5', color: '#059669' },
+  Criollo: { name: 'restaurant-outline', bg: '#fef3c7', color: '#d97706' },
+  Rápida: { name: 'pizza-outline', bg: '#fee2e2', color: '#dc2626' },
+  Postres: { name: 'ice-cream-outline', bg: '#fce7f3', color: '#db2777' },
+  default: { name: 'restaurant-outline', bg: '#eff6ff', color: '#2563eb' },
 };
 
 function RestaurantCard({ r, onPress }: { r: Restaurant; onPress: () => void }) {
@@ -28,7 +33,11 @@ function RestaurantCard({ r, onPress }: { r: Restaurant; onPress: () => void }) 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
       <View style={[styles.cardImage, { backgroundColor: icon.bg }]}>
-        <Ionicons name={icon.name as any} size={44} color={icon.color} />
+        <Ionicons
+          name={icon.name as React.ComponentProps<typeof Ionicons>['name']}
+          size={44}
+          color={icon.color}
+        />
         <View style={styles.categoryBadge}>
           <Text style={styles.categoryBadgeText}>{r.category}</Text>
         </View>
@@ -41,7 +50,11 @@ function RestaurantCard({ r, onPress }: { r: Restaurant; onPress: () => void }) 
             <Text style={styles.ratingText}>4.8</Text>
           </View>
         </View>
-        {r.description ? <Text style={styles.cardDesc} numberOfLines={1}>{r.description}</Text> : null}
+        {r.description ? (
+          <Text style={styles.cardDesc} numberOfLines={1}>
+            {r.description}
+          </Text>
+        ) : null}
         <View style={styles.cardMeta}>
           <Ionicons name="time-outline" size={13} color={theme.colors.textSecondary} />
           <Text style={styles.cardMetaText}>25-35 min</Text>
@@ -57,7 +70,7 @@ function RestaurantCard({ r, onPress }: { r: Restaurant; onPress: () => void }) 
 export default function RestaurantListScreen() {
   const navigation = useNavigation<NavProp>();
   const route = useRoute();
-  const initCategory = (route.params as any)?.category;
+  const initCategory = (route.params as { category?: string } | undefined)?.category;
 
   const [activeFilter, setActiveFilter] = useState(initCategory || 'Todos');
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -69,7 +82,7 @@ export default function RestaurantListScreen() {
     const cat = activeFilter === 'Todos' ? undefined : activeFilter;
     listRestaurants(cat)
       .then(setRestaurants)
-      .catch(e => setError(e.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [activeFilter]);
 
@@ -91,10 +104,12 @@ export default function RestaurantListScreen() {
 
       {/* Filter chips */}
       <ScrollView
-        horizontal showsHorizontalScrollIndicator={false}
-        style={styles.filterBar} contentContainerStyle={styles.filterContent}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterBar}
+        contentContainerStyle={styles.filterContent}
       >
-        {FILTERS.map(f => (
+        {FILTERS.map((f) => (
           <TouchableOpacity
             key={f}
             style={[styles.chip, activeFilter === f && styles.chipActive]}
@@ -116,7 +131,7 @@ export default function RestaurantListScreen() {
 
       <FlatList
         data={restaurants}
-        keyExtractor={r => r.id}
+        keyExtractor={(r) => r.id}
         renderItem={({ item }) => (
           <RestaurantCard
             r={item}
@@ -141,16 +156,25 @@ export default function RestaurantListScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: theme.colors.surface,
-    borderBottomWidth: 1, borderBottomColor: theme.colors.border,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text, textAlign: 'center' },
   headerSub: { fontSize: 11, color: theme.colors.textSecondary, textAlign: 'center', marginTop: 1 },
   searchBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  filterBar: { backgroundColor: theme.colors.surface, borderBottomWidth: 1, borderBottomColor: theme.colors.border, maxHeight: 52 },
+  filterBar: {
+    backgroundColor: theme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    maxHeight: 52,
+  },
   filterContent: { paddingHorizontal: 12, paddingVertical: 10, gap: 8, flexDirection: 'row' },
   chip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, backgroundColor: '#f1f5f9' },
   chipActive: { backgroundColor: theme.colors.primary },
@@ -158,14 +182,21 @@ const styles = StyleSheet.create({
   chipTextActive: { color: '#fff' },
   list: { padding: 16, gap: 14 },
   card: {
-    backgroundColor: theme.colors.surface, borderRadius: theme.roundness.large,
-    overflow: 'hidden', borderWidth: 1, borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.roundness.large,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   cardImage: { height: 130, alignItems: 'center', justifyContent: 'center' },
   categoryBadge: {
-    position: 'absolute', top: 10, left: 10,
-    backgroundColor: 'rgba(0,0,0,0.45)', borderRadius: 4,
-    paddingHorizontal: 8, paddingVertical: 3,
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   categoryBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   cardBody: { padding: 14, gap: 4 },
@@ -178,8 +209,13 @@ const styles = StyleSheet.create({
   cardMetaText: { fontSize: 12, color: theme.colors.textSecondary },
   metaDot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: theme.colors.textSecondary },
   errorBox: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    margin: 16, backgroundColor: '#fee2e2', borderRadius: theme.roundness.medium, padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    margin: 16,
+    backgroundColor: '#fee2e2',
+    borderRadius: theme.roundness.medium,
+    padding: 12,
   },
   errorText: { color: '#dc2626', fontSize: 13 },
   empty: { alignItems: 'center', paddingTop: 60, gap: 10 },

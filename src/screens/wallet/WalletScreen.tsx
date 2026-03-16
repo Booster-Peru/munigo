@@ -15,17 +15,53 @@ import { theme } from '../../config/theme';
 import { useAuth } from '../../hooks/useAuth';
 
 const TRANSACTIONS = [
-  { id: '1', type: 'DEBIT', description: 'Pago Mototaxi', amount: -4.50, time: 'Hoy, 10:45 AM', icon: 'bicycle-outline', iconBg: '#fee2e2', iconColor: '#dc2626' },
-  { id: '2', type: 'CREDIT', description: 'Recarga MuniGo', amount: 50.00, time: 'Ayer, 03:20 PM', icon: 'add-circle-outline', iconBg: '#dcfce7', iconColor: '#059669' },
-  { id: '3', type: 'DEBIT', description: 'Pedido Restaurante', amount: -28.50, time: '13/03, 01:10 PM', icon: 'restaurant-outline', iconBg: '#fee2e2', iconColor: '#dc2626' },
-  { id: '4', type: 'CREDIT', description: 'Recarga MuniGo', amount: 30.00, time: '10/03, 11:00 AM', icon: 'add-circle-outline', iconBg: '#dcfce7', iconColor: '#059669' },
+  {
+    id: '1',
+    type: 'DEBIT',
+    description: 'Pago Mototaxi',
+    amount: -4.5,
+    time: 'Hoy, 10:45 AM',
+    icon: 'bicycle-outline',
+    iconBg: '#fee2e2',
+    iconColor: '#dc2626',
+  },
+  {
+    id: '2',
+    type: 'CREDIT',
+    description: 'Recarga MuniGo',
+    amount: 50.0,
+    time: 'Ayer, 03:20 PM',
+    icon: 'add-circle-outline',
+    iconBg: '#dcfce7',
+    iconColor: '#059669',
+  },
+  {
+    id: '3',
+    type: 'DEBIT',
+    description: 'Pedido Restaurante',
+    amount: -28.5,
+    time: '13/03, 01:10 PM',
+    icon: 'restaurant-outline',
+    iconBg: '#fee2e2',
+    iconColor: '#dc2626',
+  },
+  {
+    id: '4',
+    type: 'CREDIT',
+    description: 'Recarga MuniGo',
+    amount: 30.0,
+    time: '10/03, 11:00 AM',
+    icon: 'add-circle-outline',
+    iconBg: '#dcfce7',
+    iconColor: '#059669',
+  },
 ];
 
 export default function WalletScreen() {
   const { user } = useAuth();
   const navigation = useNavigation();
   const [autoRecharge, setAutoRecharge] = React.useState(false);
-  const balance = 125.40;
+  const balance = 125.4;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,7 +112,9 @@ export default function WalletScreen() {
             <Ionicons name="business-outline" size={18} color={theme.colors.primary} />
             <Text style={styles.withdrawText}>Retirar a mi cuenta bancaria</Text>
           </TouchableOpacity>
-          <Text style={styles.withdrawNote}>Las transferencias se realizan a cuentas registradas.</Text>
+          <Text style={styles.withdrawNote}>
+            Las transferencias se realizan a cuentas registradas.
+          </Text>
 
           {/* Recharge button — YELLOW as in Stitch */}
           <TouchableOpacity
@@ -118,13 +156,19 @@ export default function WalletScreen() {
           {TRANSACTIONS.map((tx) => (
             <View key={tx.id} style={styles.txRow}>
               <View style={[styles.txIcon, { backgroundColor: tx.iconBg }]}>
-                <Ionicons name={tx.icon as any} size={18} color={tx.iconColor} />
+                <Ionicons
+                  name={tx.icon as React.ComponentProps<typeof Ionicons>['name']}
+                  size={18}
+                  color={tx.iconColor}
+                />
               </View>
               <View style={styles.txInfo}>
                 <Text style={styles.txDesc}>{tx.description}</Text>
                 <Text style={styles.txTime}>{tx.time}</Text>
               </View>
-              <Text style={[styles.txAmount, tx.type === 'CREDIT' ? styles.txCredit : styles.txDebit]}>
+              <Text
+                style={[styles.txAmount, tx.type === 'CREDIT' ? styles.txCredit : styles.txDebit]}
+              >
                 {tx.amount > 0 ? '+' : ''}S/ {Math.abs(tx.amount).toFixed(2)}
               </Text>
             </View>
@@ -184,7 +228,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  userLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: '600', letterSpacing: 1, marginRight: 8 },
+  userLabel: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 1,
+    marginRight: 8,
+  },
   userName: { color: '#fff', fontSize: 14, fontWeight: '600', flex: 1 },
   userSwitch: { transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }] },
   content: { paddingHorizontal: 16 },

@@ -33,10 +33,7 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     if (!name || !email || !password || !dni) {
-      Alert.alert(
-        'Error',
-        'Por favor completa todos los campos (Nombre, Email, DNI y Contraseña)',
-      );
+      Alert.alert('Error', 'Por favor completa todos los campos (Nombre, Email, DNI y Contraseña)');
       return;
     }
 

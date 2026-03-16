@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
-  TextInput, ScrollView, Alert, ActivityIndicator,
-  KeyboardAvoidingView, Platform,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,11 +65,11 @@ export default function MandadoRequestScreen() {
           delivery_address: deliveryAddress.trim(),
           notes: notes.trim() || undefined,
         },
-        token
+        token,
       );
       navigation.replace('MandadoConfirmation', { mandadoId: mandado.id });
-    } catch (e: any) {
-      Alert.alert('Error', e.message);
+    } catch (e: unknown) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Error');
     } finally {
       setLoading(false);
     }
@@ -143,10 +150,11 @@ export default function MandadoRequestScreen() {
             disabled={loading}
             activeOpacity={0.85}
           >
-            {loading
-              ? <ActivityIndicator color={theme.colors.text} />
-              : <Text style={styles.submitBtnText}>SOLICITAR MANDADO</Text>
-            }
+            {loading ? (
+              <ActivityIndicator color={theme.colors.text} />
+            ) : (
+              <Text style={styles.submitBtnText}>SOLICITAR MANDADO</Text>
+            )}
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -158,27 +166,42 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
   headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, textAlign: 'center', marginTop: 1 },
   content: { padding: 20, gap: 6 },
-  fieldLabel: { fontSize: 13, fontWeight: '700', color: theme.colors.textSecondary, marginBottom: 4, marginTop: 10 },
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
+    marginTop: 10,
+  },
   input: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.medium,
-    borderWidth: 1, borderColor: theme.colors.border,
-    paddingHorizontal: 14, paddingVertical: 12,
-    fontSize: 14, color: theme.colors.text,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: theme.colors.text,
   },
   inputMultiline: { minHeight: 90, paddingTop: 12 },
   fareCard: {
     backgroundColor: '#eff6ff',
     borderRadius: theme.roundness.medium,
-    flexDirection: 'row', alignItems: 'center',
-    padding: 14, gap: 12, marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    gap: 12,
+    marginTop: 16,
   },
   fareLabel: { fontSize: 14, fontWeight: '700', color: theme.colors.text },
   fareNote: { fontSize: 11, color: theme.colors.textSecondary, marginTop: 1 },
@@ -186,7 +209,8 @@ const styles = StyleSheet.create({
   submitBtn: {
     backgroundColor: theme.colors.primary,
     borderRadius: theme.roundness.medium,
-    paddingVertical: 16, alignItems: 'center',
+    paddingVertical: 16,
+    alignItems: 'center',
     marginTop: 20,
   },
   submitBtnText: { fontSize: 15, fontWeight: '800', color: theme.colors.text },

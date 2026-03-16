@@ -25,7 +25,7 @@ export async function sendSOSAlert(
     type?: string;
     description?: string;
   },
-  token: string
+  token: string,
 ): Promise<SOSAlert> {
   const res = await fetch(`${API_URL}/sos/alert`, {
     method: 'POST',

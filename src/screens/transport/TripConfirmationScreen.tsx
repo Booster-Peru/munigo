@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -29,7 +22,12 @@ export default function TripConfirmationScreen() {
 
   useEffect(() => {
     if (!token) return;
-    getActiveTrip(token).then((t) => { setTrip(t); setLoading(false); }).catch(() => setLoading(false));
+    getActiveTrip(token)
+      .then((t) => {
+        setTrip(t);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
 
     const unsubscribe = subscribeToTrip(
       tripId,
@@ -59,8 +57,8 @@ export default function TripConfirmationScreen() {
           try {
             await cancelTrip(tripId, token);
             navigation.goBack();
-          } catch (e: any) {
-            Alert.alert('Error', e.message);
+          } catch (e: unknown) {
+            Alert.alert('Error', e instanceof Error ? e.message : 'Error');
           }
         },
       },
@@ -147,12 +145,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
-  headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, textAlign: 'center', letterSpacing: 0.8, marginTop: 1 },
+  headerSub: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    textAlign: 'center',
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
   routeCard: {
     backgroundColor: theme.colors.surface,
     margin: 16,
@@ -162,7 +169,13 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   routeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  routeLine: { width: 2, height: 20, backgroundColor: theme.colors.border, marginLeft: 7, marginVertical: 4 },
+  routeLine: {
+    width: 2,
+    height: 20,
+    backgroundColor: theme.colors.border,
+    marginLeft: 7,
+    marginVertical: 4,
+  },
   routeLabel: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
   statusCard: {
     flexDirection: 'row',
@@ -174,7 +187,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   pulsingDot: {
-    width: 14, height: 14, borderRadius: 7,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: theme.colors.primary,
   },
   statusInfo: { flex: 1 },
@@ -197,9 +212,14 @@ const styles = StyleSheet.create({
   paymentChipText: { fontSize: 13, fontWeight: '600', color: theme.colors.primary },
   footer: { padding: 16 },
   cancelBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    borderWidth: 1.5, borderColor: '#dc2626',
-    borderRadius: theme.roundness.medium, padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: '#dc2626',
+    borderRadius: theme.roundness.medium,
+    padding: 16,
   },
   cancelText: { fontSize: 15, fontWeight: '700', color: '#dc2626' },
 });

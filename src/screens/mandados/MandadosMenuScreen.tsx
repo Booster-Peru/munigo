@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  View, Text, StyleSheet, TouchableOpacity, ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -19,10 +17,42 @@ const TYPES: Array<{
   bg: string;
   color: string;
 }> = [
-  { type: 'COMPRAS', label: 'Compras', desc: 'Recoge productos de tiendas', fare: 'S/ 8', icon: 'cart-outline', bg: '#eff6ff', color: '#2563eb' },
-  { type: 'TRAMITE', label: 'Trámite', desc: 'Gestiona documentos y pagos', fare: 'S/ 10', icon: 'document-text-outline', bg: '#fef3c7', color: '#d97706' },
-  { type: 'MENSAJERIA', label: 'Mensajería', desc: 'Envía paquetes y sobres', fare: 'S/ 6', icon: 'mail-outline', bg: '#f0fdf4', color: '#059669' },
-  { type: 'OTRO', label: 'Otro mandado', desc: 'Encargos personalizados', fare: 'S/ 8', icon: 'ellipsis-horizontal-circle-outline', bg: '#fdf4ff', color: '#7c3aed' },
+  {
+    type: 'COMPRAS',
+    label: 'Compras',
+    desc: 'Recoge productos de tiendas',
+    fare: 'S/ 8',
+    icon: 'cart-outline',
+    bg: '#eff6ff',
+    color: '#2563eb',
+  },
+  {
+    type: 'TRAMITE',
+    label: 'Trámite',
+    desc: 'Gestiona documentos y pagos',
+    fare: 'S/ 10',
+    icon: 'document-text-outline',
+    bg: '#fef3c7',
+    color: '#d97706',
+  },
+  {
+    type: 'MENSAJERIA',
+    label: 'Mensajería',
+    desc: 'Envía paquetes y sobres',
+    fare: 'S/ 6',
+    icon: 'mail-outline',
+    bg: '#f0fdf4',
+    color: '#059669',
+  },
+  {
+    type: 'OTRO',
+    label: 'Otro mandado',
+    desc: 'Encargos personalizados',
+    fare: 'S/ 8',
+    icon: 'ellipsis-horizontal-circle-outline',
+    bg: '#fdf4ff',
+    color: '#7c3aed',
+  },
 ];
 
 export default function MandadosMenuScreen() {
@@ -52,7 +82,7 @@ export default function MandadosMenuScreen() {
           Nuestros mandaderos locales realizan tus encargos en Canoas de Punta Sal
         </Text>
 
-        {TYPES.map(t => (
+        {TYPES.map((t) => (
           <TouchableOpacity
             key={t.type}
             style={styles.typeCard}
@@ -60,7 +90,11 @@ export default function MandadosMenuScreen() {
             onPress={() => navigation.navigate('MandadoRequest', { type: t.type })}
           >
             <View style={[styles.typeIcon, { backgroundColor: t.bg }]}>
-              <Ionicons name={t.icon as any} size={28} color={t.color} />
+              <Ionicons
+                name={t.icon as React.ComponentProps<typeof Ionicons>['name']}
+                size={28}
+                color={t.color}
+              />
             </View>
             <View style={styles.typeInfo}>
               <Text style={styles.typeLabel}>{t.label}</Text>
@@ -76,7 +110,8 @@ export default function MandadosMenuScreen() {
         <View style={styles.infoCard}>
           <Ionicons name="information-circle-outline" size={20} color={theme.colors.primary} />
           <Text style={styles.infoText}>
-            El mandadero llega en 15–30 min. Pagas al completarse el mandado con tu Billetera MuniGo.
+            El mandadero llega en 15–30 min. Pagas al completarse el mandado con tu Billetera
+            MuniGo.
           </Text>
         </View>
       </ScrollView>
@@ -88,8 +123,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   historyBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
@@ -101,13 +139,19 @@ const styles = StyleSheet.create({
   typeCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness.medium,
-    borderWidth: 1, borderColor: theme.colors.border,
-    flexDirection: 'row', alignItems: 'center',
-    padding: 14, gap: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    gap: 14,
   },
   typeIcon: {
-    width: 52, height: 52, borderRadius: 14,
-    alignItems: 'center', justifyContent: 'center',
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   typeInfo: { flex: 1 },
   typeLabel: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
@@ -115,9 +159,13 @@ const styles = StyleSheet.create({
   typeFare: { alignItems: 'flex-end', gap: 2 },
   typeFareAmount: { fontSize: 15, fontWeight: '800', color: theme.colors.primary },
   infoCard: {
-    backgroundColor: '#eff6ff', borderRadius: theme.roundness.medium,
-    flexDirection: 'row', alignItems: 'flex-start',
-    padding: 14, gap: 10, marginTop: 8,
+    backgroundColor: '#eff6ff',
+    borderRadius: theme.roundness.medium,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 14,
+    gap: 10,
+    marginTop: 8,
   },
   infoText: { flex: 1, fontSize: 13, color: '#1e3a5f', lineHeight: 18 },
 });

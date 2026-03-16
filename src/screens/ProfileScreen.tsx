@@ -1,32 +1,36 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../hooks/useAuth';
 import { theme } from '../config/theme';
 
 const ACTIVITY_ITEMS = [
-  { icon: 'bicycle-outline', label: 'Historial de viajes', iconBg: '#eff6ff', iconColor: '#2563eb' },
+  {
+    icon: 'bicycle-outline',
+    label: 'Historial de viajes',
+    iconBg: '#eff6ff',
+    iconColor: '#2563eb',
+  },
   { icon: 'bag-handle-outline', label: 'Mis pedidos', iconBg: '#fff7ed', iconColor: '#f97316' },
   { icon: 'paw-outline', label: 'Mis adopciones', iconBg: '#f0fdf4', iconColor: '#059669' },
-  { icon: 'help-circle-outline', label: 'Soporte y Ayuda', iconBg: '#fefce8', iconColor: '#ca8a04' },
+  {
+    icon: 'help-circle-outline',
+    label: 'Soporte y Ayuda',
+    iconBg: '#fefce8',
+    iconColor: '#ca8a04',
+  },
 ];
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
-  const initials = user?.fullName
-    ?.split(' ')
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase() || 'US';
+  const initials =
+    user?.fullName
+      ?.split(' ')
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase() || 'US';
 
   const handleLogout = () => {
     Alert.alert('Cerrar sesión', '¿Deseas cerrar sesión?', [
@@ -81,7 +85,11 @@ export default function ProfileScreen() {
           {ACTIVITY_ITEMS.map((item) => (
             <TouchableOpacity key={item.label} style={styles.activityRow} activeOpacity={0.8}>
               <View style={[styles.activityIcon, { backgroundColor: item.iconBg }]}>
-                <Ionicons name={item.icon as any} size={20} color={item.iconColor} />
+                <Ionicons
+                  name={item.icon as React.ComponentProps<typeof Ionicons>['name']}
+                  size={20}
+                  color={item.iconColor}
+                />
               </View>
               <Text style={styles.activityLabel}>{item.label}</Text>
               <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />

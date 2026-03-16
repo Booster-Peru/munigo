@@ -11,14 +11,14 @@ interface BannerCardProps {
 
 export const BannerCard = ({ title, subtitle, onPress, variant = 'primary' }: BannerCardProps) => {
   const bgColor =
-    variant === 'accent' ? theme.colors.accent :
-    variant === 'info' ? '#eff6ff' :
-    theme.colors.primary;
+    variant === 'accent'
+      ? theme.colors.accent
+      : variant === 'info'
+        ? '#eff6ff'
+        : theme.colors.primary;
 
   const textColor =
-    variant === 'accent' ? '#1e293b' :
-    variant === 'info' ? theme.colors.primary :
-    '#fff';
+    variant === 'accent' ? '#1e293b' : variant === 'info' ? theme.colors.primary : '#fff';
 
   return (
     <TouchableOpacity
@@ -37,9 +37,7 @@ export const BannerCard = ({ title, subtitle, onPress, variant = 'primary' }: Ba
           </Text>
         )}
       </View>
-      {onPress && (
-        <Text style={[styles.cta, { color: textColor }]}>Ver más →</Text>
-      )}
+      {onPress && <Text style={[styles.cta, { color: textColor }]}>Ver más →</Text>}
     </TouchableOpacity>
   );
 };

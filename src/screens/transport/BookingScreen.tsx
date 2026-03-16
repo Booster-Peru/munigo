@@ -70,8 +70,12 @@ export default function BookingScreen() {
           </View>
         </View>
         <View style={styles.mapZoom}>
-          <TouchableOpacity style={styles.zoomBtn}><Text style={styles.zoomText}>+</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.zoomBtn}><Text style={styles.zoomText}>−</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.zoomBtn}>
+            <Text style={styles.zoomText}>+</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.zoomBtn}>
+            <Text style={styles.zoomText}>−</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -96,7 +100,12 @@ export default function BookingScreen() {
             <View style={styles.optionRight}>
               <Text style={styles.optionPrice}>{opt.price}</Text>
               {selected === opt.id && (
-                <Ionicons name="checkmark-circle" size={20} color="#0d9488" style={{ marginTop: 4 }} />
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color="#0d9488"
+                  style={{ marginTop: 4 }}
+                />
               )}
             </View>
           </TouchableOpacity>
@@ -124,29 +133,40 @@ export default function BookingScreen() {
           activeOpacity={0.85}
           disabled={requesting}
           onPress={async () => {
-            if (!token) { Alert.alert('Error', 'Sesión no válida'); return; }
+            if (!token) {
+              Alert.alert('Error', 'Sesión no válida');
+              return;
+            }
             setRequesting(true);
             try {
-              const trip = await requestTrip({
-                origin_lat: -3.9820, origin_lng: -80.9580,
-                dest_lat: -3.9755, dest_lng: -80.9510,
-                origin_label: 'Plaza de Armas Canoas',
-                dest_label: 'Playa Punta Sal',
-                type: selected,
-              }, token);
+              const trip = await requestTrip(
+                {
+                  origin_lat: -3.982,
+                  origin_lng: -80.958,
+                  dest_lat: -3.9755,
+                  dest_lng: -80.951,
+                  origin_label: 'Plaza de Armas Canoas',
+                  dest_label: 'Playa Punta Sal',
+                  type: selected,
+                },
+                token,
+              );
               navigation.navigate('TripConfirmation', { tripId: trip.id });
-            } catch (e: any) {
-              Alert.alert('Error', e.message || 'No se pudo crear el viaje');
+            } catch (e: unknown) {
+              Alert.alert('Error', e instanceof Error ? e.message : 'No se pudo crear el viaje');
             } finally {
               setRequesting(false);
             }
           }}
         >
-          {requesting
-            ? <ActivityIndicator color={theme.colors.text} />
-            : <><Text style={styles.ctaText}>SOLICITAR MOTOTAXI</Text>
-               <Ionicons name="arrow-forward" size={18} color={theme.colors.text} /></>
-          }
+          {requesting ? (
+            <ActivityIndicator color={theme.colors.text} />
+          ) : (
+            <>
+              <Text style={styles.ctaText}>SOLICITAR MOTOTAXI</Text>
+              <Ionicons name="arrow-forward" size={18} color={theme.colors.text} />
+            </>
+          )}
         </TouchableOpacity>
 
         <View style={{ height: 20 }} />
@@ -169,7 +189,13 @@ const styles = StyleSheet.create({
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text, textAlign: 'center' },
-  headerSub: { fontSize: 10, color: theme.colors.textSecondary, textAlign: 'center', letterSpacing: 0.8, marginTop: 1 },
+  headerSub: {
+    fontSize: 10,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
   infoBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   mapArea: {
     height: 200,
@@ -179,20 +205,42 @@ const styles = StyleSheet.create({
   },
   mapContent: { alignItems: 'center', gap: 6 },
   originPin: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
-    elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.12, shadowRadius: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
   },
   routeLine: { width: 2, height: 28, backgroundColor: theme.colors.primary, opacity: 0.3 },
   destPin: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
-    elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.12, shadowRadius: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
   },
   pinLabel: { fontSize: 12, fontWeight: '600', color: theme.colors.text },
   mapZoom: {
-    position: 'absolute', right: 12, top: '50%',
-    backgroundColor: '#fff', borderRadius: 8, overflow: 'hidden',
+    position: 'absolute',
+    right: 12,
+    top: '50%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    overflow: 'hidden',
     elevation: 2,
   },
   zoomBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
@@ -207,15 +255,24 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: theme.colors.text, marginBottom: 14 },
   optionCard: {
-    flexDirection: 'row', alignItems: 'center',
-    padding: 14, borderRadius: theme.roundness.medium,
-    borderWidth: 1.5, borderColor: theme.colors.border,
-    marginBottom: 10, backgroundColor: theme.colors.surface, gap: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: theme.roundness.medium,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    marginBottom: 10,
+    backgroundColor: theme.colors.surface,
+    gap: 12,
   },
   optionCardSelected: { borderColor: theme.colors.primary, backgroundColor: '#eff6ff' },
   optionIcon: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#eff6ff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   optionInfo: { flex: 1 },
   optionLabel: { fontSize: 15, fontWeight: '700', color: theme.colors.text },
@@ -230,9 +287,13 @@ const styles = StyleSheet.create({
   couponText: { fontSize: 13, color: theme.colors.textSecondary },
   divider: { height: 1, backgroundColor: theme.colors.border, marginBottom: 16 },
   ctaBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
     backgroundColor: theme.colors.accent,
-    borderRadius: theme.roundness.medium, padding: 18,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   ctaText: { fontSize: 16, fontWeight: '800', color: theme.colors.text, letterSpacing: 0.5 },
 });

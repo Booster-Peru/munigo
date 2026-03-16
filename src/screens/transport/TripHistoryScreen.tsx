@@ -15,17 +15,25 @@ import { useAuth } from '../../hooks/useAuth';
 import { getTripHistory, Trip } from '../../services/transportService';
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  completed:  { label: 'Completado',  color: '#059669', bg: '#dcfce7' },
-  cancelled:  { label: 'Cancelado',   color: '#dc2626', bg: '#fee2e2' },
-  in_progress:{ label: 'En curso',    color: '#2563eb', bg: '#dbeafe' },
-  accepted:   { label: 'Aceptado',    color: '#0d9488', bg: '#ccfbf1' },
-  pending:    { label: 'Buscando',    color: '#d97706', bg: '#fef3c7' },
+  completed: { label: 'Completado', color: '#059669', bg: '#dcfce7' },
+  cancelled: { label: 'Cancelado', color: '#dc2626', bg: '#fee2e2' },
+  in_progress: { label: 'En curso', color: '#2563eb', bg: '#dbeafe' },
+  accepted: { label: 'Aceptado', color: '#0d9488', bg: '#ccfbf1' },
+  pending: { label: 'Buscando', color: '#d97706', bg: '#fef3c7' },
 };
 
 function TripRow({ trip }: { trip: Trip }) {
-  const status = STATUS_LABELS[trip.status] || { label: trip.status, color: '#64748b', bg: '#f1f5f9' };
+  const status = STATUS_LABELS[trip.status] || {
+    label: trip.status,
+    color: '#64748b',
+    bg: '#f1f5f9',
+  };
   const date = new Date(trip.created_at);
-  const formatted = date.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+  const formatted = date.toLocaleDateString('es-PE', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 
   return (
     <View style={styles.tripRow}>
@@ -36,7 +44,9 @@ function TripRow({ trip }: { trip: Trip }) {
         <Text style={styles.tripDest} numberOfLines={1}>
           {trip.dest_label || 'Destino'}
         </Text>
-        <Text style={styles.tripMeta}>{formatted} · {trip.type === 'premium' ? 'Premium' : 'Standard'}</Text>
+        <Text style={styles.tripMeta}>
+          {formatted} · {trip.type === 'premium' ? 'Premium' : 'Standard'}
+        </Text>
       </View>
       <View style={styles.tripRight}>
         <Text style={styles.tripFare}>S/ {Number(trip.fare).toFixed(2)}</Text>
@@ -77,9 +87,7 @@ export default function TripHistoryScreen() {
         <View style={{ width: 36 }} />
       </View>
 
-      {loading && (
-        <ActivityIndicator style={{ marginTop: 40 }} color={theme.colors.primary} />
-      )}
+      {loading && <ActivityIndicator style={{ marginTop: 40 }} color={theme.colors.primary} />}
 
       {error && (
         <View style={styles.errorBox}>
@@ -111,22 +119,37 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   header: {
     backgroundColor: '#1a2340',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center' },
-  headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, textAlign: 'center', letterSpacing: 0.8, marginTop: 1 },
+  headerSub: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    textAlign: 'center',
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
   list: { padding: 16 },
   tripRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
     paddingVertical: 13,
-    borderBottomWidth: 1, borderBottomColor: theme.colors.border,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
   tripIcon: {
-    width: 38, height: 38, borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
     backgroundColor: '#eff6ff',
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tripInfo: { flex: 1 },
   tripDest: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
@@ -136,9 +159,13 @@ const styles = StyleSheet.create({
   statusBadge: { borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
   statusText: { fontSize: 10, fontWeight: '700' },
   errorBox: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    margin: 16, backgroundColor: '#fee2e2',
-    borderRadius: theme.roundness.medium, padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    margin: 16,
+    backgroundColor: '#fee2e2',
+    borderRadius: theme.roundness.medium,
+    padding: 14,
   },
   errorText: { color: '#dc2626', fontSize: 13 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, paddingTop: 60 },

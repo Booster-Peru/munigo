@@ -15,7 +15,10 @@ export default function OrderDeliveredScreen() {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = () => {
-    if (!rating) { Alert.alert('Calificación requerida', 'Selecciona una calificación.'); return; }
+    if (!rating) {
+      Alert.alert('Calificación requerida', 'Selecciona una calificación.');
+      return;
+    }
     setSubmitted(true);
     setTimeout(() => navigation.navigate('Dashboard'), 1200);
   };
@@ -40,7 +43,7 @@ export default function OrderDeliveredScreen() {
       <View style={styles.ratingCard}>
         <Text style={styles.ratingTitle}>¿Cómo estuvo tu pedido?</Text>
         <View style={styles.starsRow}>
-          {[1, 2, 3, 4, 5].map(star => (
+          {[1, 2, 3, 4, 5].map((star) => (
             <TouchableOpacity key={star} onPress={() => setRating(star)} activeOpacity={0.8}>
               <Ionicons
                 name={star <= rating ? 'star' : 'star-outline'}
@@ -81,13 +84,23 @@ export default function OrderDeliveredScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
-  header: { backgroundColor: '#1a2340', paddingHorizontal: 16, paddingVertical: 14, alignItems: 'center' },
+  header: {
+    backgroundColor: '#1a2340',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
   headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700' },
   headerSub: { color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 1, letterSpacing: 0.8 },
   successSection: { alignItems: 'center', paddingVertical: 36, gap: 10 },
   successCircle: {
-    width: 90, height: 90, borderRadius: 45,
-    backgroundColor: '#059669', alignItems: 'center', justifyContent: 'center', marginBottom: 4,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#059669',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   successTitle: { fontSize: 24, fontWeight: '800', color: theme.colors.text },
   successSub: { fontSize: 14, color: theme.colors.textSecondary },
@@ -97,8 +110,13 @@ const styles = StyleSheet.create({
   ratingHint: { fontSize: 16, color: theme.colors.textSecondary },
   footer: { padding: 16, gap: 10 },
   ctaBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-    backgroundColor: theme.colors.accent, borderRadius: theme.roundness.medium, padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.roundness.medium,
+    padding: 18,
   },
   ctaText: { fontSize: 15, fontWeight: '800', color: theme.colors.text, letterSpacing: 0.5 },
   skipBtn: { alignItems: 'center', padding: 10 },
